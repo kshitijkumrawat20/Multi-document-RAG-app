@@ -5,6 +5,14 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
+    "fitz>=0.0.1.dev2",
     "ipykernel>=6.30.1",
     "langchain>=0.3.27",
+    "langchain-community>=0.3.27",
+    "langchain-google-genai>=2.1.9",
+    "langchain-groq>=0.3.7",
+    "langchain-pinecone>=0.2.11",
+    "pinecone>=7.3.0",
+    "pymupdf>=1.26.3",
+    "scikit-learn>=1.7.1",
 ]
