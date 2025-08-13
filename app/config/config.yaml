@@ -1,0 +1,14 @@
+llm:
+  groq: 
+    provider: "groq"
+    model_name: "qwen/qwen3-32b"
+  gemini:
+    provider: "gemini"
+    model_name: "gemini-2.5-flash"
+
+embedding_model: 
+  openai: 
+    provider: "openai"
+    model_name: "text-embedding-3-small"
+
+    
