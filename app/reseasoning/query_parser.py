@@ -1,6 +1,6 @@
-from utils.model_loader import ModelLoader
-from schemas.request_models import QuerySpec
-from prompts.prompts import PARSER_PROMPT
+from app.utils.model_loader import ModelLoader
+from app.schemas.request_models import QuerySpec
+from app.prompts.prompts import PARSER_PROMPT
 
 def parsing_query(query:str, llm) -> QuerySpec:
     # Bind the schema to the model

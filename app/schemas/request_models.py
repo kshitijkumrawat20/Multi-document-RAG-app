@@ -1,4 +1,4 @@
-from pydantic import BaseModel, model_validator,field_validator
+from pydantic import BaseModel, model_validator,field_validator, HttpUrl, Field
 from typing import List, Dict, Any, Optional
 import json
 class QuerySpec(BaseModel):
@@ -47,6 +47,15 @@ class LogicResult(BaseModel):
     evidence: List[ClauseHit]
     rationale: str
     
+class HackRxRunRequest(BaseModel):
+    documents: HttpUrl = Field(
+        ...,
+        description="URL to the document (PDF, DOCX, or email blob)"
+    )
+    questions: List[str] = Field(
+        ...,
+        description="List of questions to query against the document"
+    )
 
 
 

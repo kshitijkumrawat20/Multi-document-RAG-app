@@ -3,12 +3,12 @@ import os
 from dotenv import load_dotenv
 from pydantic import BaseModel, Field
 from typing import Literal, Optional,Any
-from utils.config_loader import load_config
+from app.utils.config_loader import load_config
 from langchain_groq import ChatGroq 
 from langchain_google_genai import ChatGoogleGenerativeAI
 from dotenv import load_dotenv
-from langchain_openai import OpenAIEmbeddings
-
+# from langchain_openai import OpenAIEmbeddings
+from langchain_community.embeddings import OpenAIEmbeddings
 class ConfigLoader:
     def __init__(self):
         print(f"Loading config....")

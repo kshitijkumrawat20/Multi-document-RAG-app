@@ -1,4 +1,4 @@
-from schemas.request_models import QuerySpec, LogicResult
+from app.schemas.request_models import QuerySpec, LogicResult
 
 
 def evaluate_with_llm(raw_query: str, top_clauses: list, llm):

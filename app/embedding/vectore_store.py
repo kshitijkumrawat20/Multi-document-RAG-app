@@ -4,7 +4,6 @@ from pinecone import Pinecone
 from pinecone import ServerlessSpec
 from langchain_pinecone import PineconeVectorStore
 from datetime import datetime
-from utils.model_loader import ModelLoader
 from uuid import uuid4
 
 current_time = datetime.now()

@@ -1,4 +1,4 @@
-from schemas.request_models import ClauseHit
+from app.schemas.request_models import ClauseHit
 
 
 def retrieval_from_pinecone_vectoreStore(pinecone_index, embeddings, top_k= 3, filter_meta = None):

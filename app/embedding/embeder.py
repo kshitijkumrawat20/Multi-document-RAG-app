@@ -1,7 +1,6 @@
 import os
 from dotenv import load_dotenv
-from utils.model_loader import ModelLoader
-from schemas.request_models import QuerySpec
+from app.schemas.request_models import QuerySpec
 
 
 def get_query_embedding(query_spec: QuerySpec, embedding_model):

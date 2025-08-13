@@ -1,9 +1,5 @@
-import fitz
+import fitz 
 import os 
-import docx
-import email
-import extract_msg
-from io import BytesIO
 import requests
 
 def load_documents_form_url(url:str):
