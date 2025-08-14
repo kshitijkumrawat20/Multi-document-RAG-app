@@ -1,12 +1,12 @@
 from pydantic import BaseModel, model_validator,field_validator, HttpUrl, Field
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any, Optional, Union
 import json
 class QuerySpec(BaseModel):
-    raw_query: str 
-    intent: str 
-    entities: Dict[str, str]
+    raw_query: str
+    intent: str
+    entities: Dict[str, Union[str, List[str]]]
     constraints : Dict[str, Any]
-    answer_type: str 
+    answer_type: str
     followups: Optional[List[str]] = []
 
     @model_validator(mode = "before")

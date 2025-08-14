@@ -9,6 +9,7 @@ def text_splitting(doc_content: str):
     split the documents into chunks and add metadata fields with every document
     """
     splitter = RecursiveCharacterTextSplitter(chunk_size=800, chunk_overlap=100)
+    text = ""
     for i,page in enumerate(doc_content): 
         text += page.get_text()
         uuid = str(uuid4())

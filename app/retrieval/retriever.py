@@ -1,7 +1,7 @@
 from app.schemas.request_models import ClauseHit
 
 
-def retrieval_from_pinecone_vectoreStore(pinecone_index, embeddings, top_k= 3, filter_meta = None):
+def retrieval_from_pinecone_vectoreStore(pinecone_index, embeddings, top_k= 3, filter_meta = None, namespace= None):
     """
     Retrieve the top matching chunks from Pinecone.
     
@@ -19,7 +19,8 @@ def retrieval_from_pinecone_vectoreStore(pinecone_index, embeddings, top_k= 3, f
         top_k =top_k ,
         include_metadata = True, 
         include_values = False, 
-        filter = filter_meta 
+        filter = filter_meta,
+        namespace = namespace
         )
     hits= []
     for match in res['matches']:

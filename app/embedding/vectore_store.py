@@ -13,7 +13,7 @@ def create_vectore_store(text_chunks:list, embedding_model):
     pinecone_key = os.getenv("PINECONE_API_KEY")
     pc = Pinecone(api_key=pinecone_key)
     time_string = current_time.strftime("%Y-%m-%d-%H-%M")
-    index_name = f"hackrx-index{time_string}"
+    index_name = f"hackrx-index"
     if not pc.has_index(index_name):
         pc.create_index(
             name = index_name,
@@ -27,8 +27,9 @@ def create_vectore_store(text_chunks:list, embedding_model):
     # embedding_model = model_loader.load_llm()
     uuids = [str(uuid4()) for _ in range(len(text_chunks)) ]
     vector_store = PineconeVectorStore(index = index, embedding=embedding_model)
-    vector_store.add_documents(documents=text_chunks, ids = uuids)
+    name_space = f"hackrx-index{time_string}"
+    vector_store.add_documents(documents=text_chunks, ids = uuids,namespace = name_space )
 
-    return index
+    return index, name_space
 
 

@@ -41,6 +41,7 @@ class ModelLoader(BaseModel):
             llm = ChatGroq(model = model_name, api_key = groq_api_key)
         elif self.model_provider =="gemini":
             print("Loading model from gemini:")
+            load_dotenv()
             gemini_api_key = os.getenv("GEMINI_API_KEY")
             model_name = self.config["llm"]["gemini"]["model_name"]
             llm = ChatGoogleGenerativeAI(
@@ -51,8 +52,8 @@ class ModelLoader(BaseModel):
             load_dotenv()
             print("Loading model from openai:")
             api_key = os.getenv("OPENAI_API_KEY")
-            model_name = self.config["llm"]["openai"]["model_name"]
-            llm = OpenAIEmbeddings(model="text-embedding-3-small", api_key = api_key)
+            model_name = self.config["embedding_model"]["openai"]["model_name"]
+            llm = OpenAIEmbeddings(model=model_name, api_key = api_key)
         else: 
             raise ValueError(f"Unsupported model provider: {self.model_provider}")
         return llm

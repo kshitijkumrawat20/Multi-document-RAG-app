@@ -1,6 +1,7 @@
 import os
 from dotenv import load_dotenv
 from app.schemas.request_models import QuerySpec
+from typing import Union, List
 
 
 def get_query_embedding(query_spec: QuerySpec, embedding_model):
@@ -11,5 +12,11 @@ def get_query_embedding(query_spec: QuerySpec, embedding_model):
     e_main =  embedding_model.embed_query(q)
     expansions = []
     if "procedure" in query_spec.entities:
-        expansions.append(f"{q} OR {query_spec.entities['procedure']} procedures related")
-    return e_main, expansions
+        procedure_value = query_spec.entities['procedure']
+        # Handle both string and list values
+        if isinstance(procedure_value, list):
+            procedure_str = ", ".join(procedure_value)
+        else:
+            procedure_str = procedure_value
+        expansions.append(f"{q} OR {procedure_str} procedures related")
+    return e_main,expansions
