@@ -8,3 +8,4 @@ langchain-pinecone
 fastapi 
 langchain-google-genai
 pydantic
+uvicorn 
