@@ -135,7 +135,6 @@ dependencies = [
     "python-dateutil==2.9.0.post0",
     "python-dotenv==1.1.1",
     "pytz==2025.2",
-    "pywin32==311",
     "pyxnat==1.6.3",
     "pyyaml==6.0.2",
     "pyzmq==27.0.1",
