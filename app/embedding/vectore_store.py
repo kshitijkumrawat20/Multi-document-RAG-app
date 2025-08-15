@@ -12,6 +12,7 @@ def create_vectore_store(text_chunks:list, embedding_model):
     load_dotenv()
     pinecone_key = os.getenv("PINECONE_API_KEY")
     pc = Pinecone(api_key=pinecone_key)
+    pc._vector_api.api_client.pool_threads = 1  
     time_string = current_time.strftime("%Y-%m-%d-%H-%M")
     index_name = f"hackrx-index"
     if not pc.has_index(index_name):
