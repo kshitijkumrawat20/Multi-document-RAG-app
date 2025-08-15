@@ -1,23 +1,22 @@
 # Use official Python image as base
 FROM python:3.12-slim
 
-# Set working directory
+# Create a non-root user
+RUN useradd -m -u 1000 user
+USER user
+ENV PATH="/home/user/.local/bin:$PATH"
+
 WORKDIR /app
 
-# Copy project files
-COPY . /app
+# Install dependencies as user
+COPY --chown=user ./requirements.txt requirements.txt
+RUN pip install --no-cache-dir --upgrade -r requirements.txt
 
-# Install system dependencies (if needed)
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
-    && rm -rf /var/lib/apt/lists/*
+# Copy all files as user
+COPY --chown=user . /app
 
-# Install Python dependencies
-RUN pip install --upgrade pip \
-    && pip install -r requirements.txt
+# Expose Hugging Face Spaces default port
+EXPOSE 7860
 
-# Expose port (if using uvicorn or similar)
-EXPOSE 8000
-
-# Default command (update if your entrypoint is different)
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Start FastAPI app with Uvicorn on port 7860
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "7860"]

@@ -11,3 +11,7 @@ wheels/
 .env
 env
 .env/
+hackrx_rag_app
+hackrx_rag_app/
+.hackrx_rag_app
+hackrx_rag_app/
