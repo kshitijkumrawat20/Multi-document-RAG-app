@@ -1,6 +1,7 @@
 import pymupdf 
 import os 
 import requests
+import pymupdf
 
 def load_documents_form_url(url:str):
     """
@@ -14,6 +15,13 @@ def load_documents_form_url(url:str):
         return pdf_doc
     else: 
         return "FILE NOT supported"
+    
+def load_from_pdf(pdf_path: str):
+    """Load the uploaded pdf"""
+    try:
+        
+
+    
     
 
         
