@@ -10,5 +10,4 @@ This project is a PDF Retrieval-Augmented Generation (RAG) application built usi
 - LangChain
 - PyPDF2
 - OpenAI API
-
 - Streamlit
