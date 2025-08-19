@@ -11,3 +11,4 @@ This project is a PDF Retrieval-Augmented Generation (RAG) application built usi
 - PyPDF2
 - OpenAI API
 - Streamlit
+
