@@ -389,6 +389,15 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/4a/8e/5a01644697b03016de339ef444cfff28367f92984dc74eddaab1ed60eada/docx-0.2.4.tar.gz", hash = "sha256:9d7595eac6e86cda0b7136a2995318d039c1f3eaa368a3300805abbbe5dc8877", size = 54925, upload-time = "2014-02-06T10:02:49.394Z" }
 
 [[package]]
+name = "docx2txt"
+version = "0.9"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/ea/07/4486a038624e885e227fe79111914c01f55aa70a51920ff1a7f2bd216d10/docx2txt-0.9.tar.gz", hash = "sha256:18013f6229b14909028b19aa7bf4f8f3d6e4632d7b089ab29f7f0a4d1f660e28", size = 3613, upload-time = "2025-03-24T20:59:25.21Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/d6/51/756e71bec48ece0ecc2a10e921ef2756e197dcb7e478f2b43673b6683902/docx2txt-0.9-py3-none-any.whl", hash = "sha256:e3718c0653fd6f2fcf4b51b02a61452ad1c38a4c163bcf0a6fd9486cd38f529a", size = 4025, upload-time = "2025-03-24T20:59:24.394Z" },
+]
+
+[[package]]
 name = "easygui"
 version = "0.98.3"
 source = { registry = "https://pypi.org/simple" }
@@ -1904,6 +1913,19 @@ wheels = [
 ]
 
 [[package]]
+name = "python-docx"
+version = "1.2.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "lxml" },
+    { name = "typing-extensions" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/a9/f7/eddfe33871520adab45aaa1a71f0402a2252050c14c7e3009446c8f4701c/python_docx-1.2.0.tar.gz", hash = "sha256:7bc9d7b7d8a69c9c02ca09216118c86552704edc23bac179283f2e38f86220ce", size = 5723256, upload-time = "2025-06-16T20:46:27.921Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/d0/00/1e03a4989fa5795da308cd774f05b704ace555a70f9bf9d3be057b680bcf/python_docx-1.2.0-py3-none-any.whl", hash = "sha256:3fd478f3250fbbbfd3b94fe1e985955737c145627498896a8a6bf81f4baf66c7", size = 252987, upload-time = "2025-06-16T20:46:22.506Z" },
+]
+
+[[package]]
 name = "python-dotenv"
 version = "1.1.1"
 source = { registry = "https://pypi.org/simple" }
@@ -2016,6 +2038,7 @@ dependencies = [
     { name = "decorator" },
     { name = "distro" },
     { name = "docx" },
+    { name = "docx2txt" },
     { name = "easygui" },
     { name = "ebcdic" },
     { name = "etelemetry" },
@@ -2118,6 +2141,7 @@ dependencies = [
     { name = "pytest-recording" },
     { name = "pytest-socket" },
     { name = "python-dateutil" },
+    { name = "python-docx" },
     { name = "python-dotenv" },
     { name = "pytz" },
     { name = "pyxnat" },
@@ -2193,6 +2217,7 @@ requires-dist = [
     { name = "decorator", specifier = "==5.2.1" },
     { name = "distro", specifier = "==1.9.0" },
     { name = "docx", specifier = "==0.2.4" },
+    { name = "docx2txt", specifier = ">=0.9" },
     { name = "easygui", specifier = "==0.98.3" },
     { name = "ebcdic", specifier = "==1.1.1" },
     { name = "etelemetry", specifier = "==0.3.1" },
@@ -2295,6 +2320,7 @@ requires-dist = [
     { name = "pytest-recording", specifier = "==0.13.4" },
     { name = "pytest-socket", specifier = "==0.7.0" },
     { name = "python-dateutil", specifier = "==2.9.0.post0" },
+    { name = "python-docx", specifier = ">=1.2.0" },
     { name = "python-dotenv", specifier = "==1.1.1" },
     { name = "pytz", specifier = "==2025.2" },
     { name = "pyxnat", specifier = "==1.6.3" },
