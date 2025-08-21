@@ -32,14 +32,15 @@ class fileloader:
     
     ## word document processing
 
-    def load_word_document(self, path: str):
+    def load_word_document(self, path: str) :
         try: 
             docx_loader = Docx2txtLoader(path)
             docs = docx_loader.load()
             return docs
         except Exception as e:
             print(e)
-        
+    
+
 
     
     

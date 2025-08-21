@@ -5,7 +5,6 @@ from langchain.prompts import PromptTemplate
 from uuid import uuid4
 from typing import List, Dict
 
-
 class splitting_text:
 
     def _clean_text(self, text:str)-> str: 
