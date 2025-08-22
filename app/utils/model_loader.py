@@ -19,7 +19,7 @@ class ConfigLoader:
     
 
 class ModelLoader(BaseModel):
-    model_provider: Literal["groq", "gemini", "openai"] = "gemini" 
+    model_provider: Literal["groq", "gemini", "openai","gemini_lite"] = "gemini" 
     config: Optional[ConfigLoader] = Field(default = None, exclude = True) # either the config is ConfigLoader object or None
 
     def model_post_init(self, __context: Any)->None:
@@ -39,11 +39,21 @@ class ModelLoader(BaseModel):
             groq_api_key = os.getenv("GROQ_API_KEY")
             model_name = self.config["llm"]["groq"]["model_name"]
             llm = ChatGroq(model = model_name, api_key = groq_api_key)
+            
         elif self.model_provider =="gemini":
             print("Loading model from gemini:")
             load_dotenv()
             gemini_api_key = os.getenv("GEMINI_API_KEY")
             model_name = self.config["llm"]["gemini"]["model_name"]
+            llm = ChatGoogleGenerativeAI(
+                model=model_name,
+                google_api_key= gemini_api_key
+            )
+        elif self.model_provider =="gemini_lite":
+            print("Loading model from gemini-flash-lite:")
+            load_dotenv()
+            gemini_api_key = os.getenv("GEMINI_API_KEY")
+            model_name = self.config["llm"]["gemini_lite"]["model_name"]
             llm = ChatGoogleGenerativeAI(
                 model=model_name,
                 google_api_key= gemini_api_key
