@@ -3,25 +3,40 @@ from langchain_community.document_loaders import PyMuPDFLoader
 import os
 from langchain_community.document_loaders import Docx2txtLoader
 import pymupdf
+import tempfile
+
 class fileloader: 
     def __init__(self):
         self.pdf_document = None
+    
+    def get_file_type_by_extension(self,filename):
+        _, extension = os.path.splitext(filename)
+        extension = extension.lower()
+        if extension == ".txt":
+            return "text"
+        elif extension == ".pdf":
+            return "pdf"
+        elif extension in [".doc", ".docx"]:
+            return "word"
+        else:
+            return "unknown"
 
-    def load_documents_form_url(self, url:str):
-        """
-        Load documents from a given URL and return their content."""
-        
+    def load_documents_from_url(self, url: str):
         response = requests.get(url)
-        response.raise_for_status()  # Ensure we got a valid response
-        # check file type
+        response.raise_for_status()
         if response.headers['Content-Type'] == 'application/pdf':
-            pdf_document = pymupdf.open(stream = response.content, filetype="pdf")
-            return pdf_document
-        else: 
-            return "FILE NOT supported"
-        
-        
-        
+            # Save PDF to a temporary file
+            with tempfile.NamedTemporaryFile(suffix=".pdf", delete=False) as tmp_file:
+                tmp_file.write(response.content)
+                tmp_file_path = tmp_file.name
+            
+            # Load PDF from the temporary file path
+            loader = PyMuPDFLoader(tmp_file_path)
+            docs = loader.load()
+            return docs
+        else:
+            raise ValueError("File type not supported, expected a PDF.")
+              
     def load_pdf(self, path:str):
         """ Load PDF from a local path and return its content."""
         if not os.path.exists(path):
