@@ -1,21 +1,62 @@
 import json
 from langchain_core.exceptions import OutputParserException
 from langchain_core.documents import Document
-from app.schemas.request_models import InsuranceMetadata
 from langchain_core.output_parsers import PydanticOutputParser
 from langchain_core.prompts import ChatPromptTemplate
-
+from typing import Type
+from pydantic import BaseModel
 # wrap parser with fixer once
 # pydantic_parser = PydanticOutputParser(pydantic_object=InsuranceMetadata)
 # fixing_parser = OutputFixingParser.from_llm(llm=llm, parser=pydantic_parser) 
 
 
 class MetadataExtractor:
-    
-    def extractInsuranceMetadata(self, llm ,document: Document, known_keywords: dict) -> InsuranceMetadata:
-        parser = PydanticOutputParser(pydantic_object=InsuranceMetadata)
 
-        schema_str = json.dumps(InsuranceMetadata.model_json_schema(), indent=2)
+    def extractInsuranceMetadata_query(llm , metadata_class : Type[BaseModel],document: Document, known_keywords: dict) -> BaseModel:
+        parser = PydanticOutputParser(pydantic_object=metadata_class)
+
+        schema_str = json.dumps(metadata_class.model_json_schema(), indent=2)
+        keywords_str = json.dumps(known_keywords, indent=2)
+
+        prompt = ChatPromptTemplate.from_messages([
+            ("system", """You are an information extraction system. 
+            Extract only the required metadata from the user query using the existing known keywords. 
+
+            ⚠️ Rules for consistency:
+            - For exclusions and obligations, DO NOT copy full sentences. 
+            - Instead, extract only concise normalized keywords (2–5 words max each).
+            - Use existing keywords if they already exist in the provided list.
+            - Prefer to reuse existing keywords if they are semantically the same.  
+            - If you find a new keyword that is a **sub-type** or **more specific variant** of an existing one, keep both:  
+            *reuse the closest match from existing keywords*, and also add the new one.  
+            - In that case, set `added_new_keyword=true`.
+            - Do not include raw paragraphs in the output.
+            
+            Schema you must follow:
+            {schema}
+
+            Existing Keywords:
+            {keywords}
+            """),
+            ("human", "Text:\n{document_content}")
+        ])
+        chain = prompt | llm | parser
+
+        try:
+            result = chain.invoke({
+                "schema": schema_str,
+                "keywords": keywords_str,
+                "document_content": document.page_content
+            })
+            return result
+        except OutputParserException as e:
+            print(f"⚠️ Parser failed on doc {document.metadata.get('source')} | error: {e}")
+            return metadata_class(added_new_keyword=False)
+    
+    def extractInsuranceMetadata(self, llm , metadata_class : Type[BaseModel], document: Document, known_keywords: dict) -> BaseModel:
+        parser = PydanticOutputParser(pydantic_object=metadata_class)
+
+        schema_str = json.dumps(metadata_class.model_json_schema(), indent=2)
         keywords_str = json.dumps(known_keywords, indent=2)
 
         prompt = ChatPromptTemplate.from_messages([
@@ -48,7 +89,7 @@ class MetadataExtractor:
         chain = prompt | llm | parser
 
         try:
-            result: InsuranceMetadata = chain.invoke({
+            result = chain.invoke({
                 "schema": schema_str,
                 "keywords": keywords_str,
                 "document_content": document.page_content
@@ -56,4 +97,4 @@ class MetadataExtractor:
             return result
         except OutputParserException as e:
             print(f"⚠️ Parser failed on doc {document.metadata.get('source')} | error: {e}")
-            return InsuranceMetadata(added_new_keyword=False) 
+            return metadata_class(added_new_keyword=False)   # instantiate fallback

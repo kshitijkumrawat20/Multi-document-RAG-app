@@ -4,7 +4,7 @@ from langchain.prompts import PromptTemplate
 from uuid import uuid4
 from typing import List, Dict
 import os 
-from app.metadata_extraction.metadata_ext import MetadataExtractor
+import json
 class splitting_text:
 
     def normalize_dict_to_lists(self, metadata: dict) -> dict:
@@ -31,8 +31,7 @@ class splitting_text:
         return text
 
     def text_splitting(self,metadata_extractor, doc: List[Document]) -> List[Document]:
-        from langchain.text_splitter import RecursiveCharacterTextSplitter
-        import json
+        
 
         all_chunks = []
         splitter = RecursiveCharacterTextSplitter(chunk_size=800, chunk_overlap=100)
@@ -42,7 +41,7 @@ class splitting_text:
                 text = page.get_text()
             except:
                 text = page.page_content
-            print(type(page))
+            # print(type(page))
                         
                     # text = self._clean_text(text)
 
