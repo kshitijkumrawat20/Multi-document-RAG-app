@@ -13,5 +13,8 @@ embedding_model:
   openai: 
     provider: "openai"
     model_name: "text-embedding-3-small"
+  hf_model:
+    provider: "huggingface"
+    model_name: "mixedbread-ai/mxbai-embed-large-v1"
 
     

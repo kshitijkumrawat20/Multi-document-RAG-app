@@ -5,24 +5,9 @@ from uuid import uuid4
 from typing import List, Dict
 import os 
 import json
+from app.utils.metadata_utils import MetadataService
 class splitting_text:
-
-    def normalize_dict_to_lists(self, metadata: dict) -> dict:
-        """
-        Convert every value in a dict to a list (unless it's None).
-        - None → []
-        - list → as-is
-        - scalar → wrap in list
-        """
-        normalized = {}
-        for key, value in metadata.items():
-            if value is None:
-                normalized[key] = []
-            elif isinstance(value, list):
-                normalized[key] = value
-            else:
-                normalized[key] = [value]
-        return normalized
+    
     
     def _clean_text(self, text:str)-> str: 
         """Clean extracted page content"""
@@ -53,7 +38,7 @@ class splitting_text:
                 # First page → extract + create JSON
                 Document_metadata = metadata_extractor(page, known_keywords={})
                 extracted = Document_metadata.model_dump()
-                normalized = self.normalize_dict_to_lists(extracted)
+                normalized = MetadataService.normalize_dict_to_lists(extracted)
 
                 with open(output_path, "w") as f:
                     json.dump(normalized, f, indent=4)

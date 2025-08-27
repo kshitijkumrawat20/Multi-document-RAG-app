@@ -7,6 +7,7 @@ from app.utils.config_loader import load_config
 from langchain_groq import ChatGroq 
 from langchain_google_genai import ChatGoogleGenerativeAI
 from dotenv import load_dotenv
+from langchain_huggingface import HuggingFaceEmbeddings
 # from langchain_openai import OpenAIEmbeddings
 from langchain_community.embeddings import OpenAIEmbeddings
 class ConfigLoader:
@@ -23,7 +24,7 @@ class ModelLoader(BaseModel):
     config: Optional[ConfigLoader] = Field(default = None, exclude = True) # either the config is ConfigLoader object or None
 
     def model_post_init(self, __context: Any)->None:
-        self.config = ConfigLoader()   # model_post_init is a Pydantic V2 hook, which runs after model creation.It assigns a ConfigLoader() instance to self.config.This ensures the configuration is loaded whenever you create a ModelLoader.
+        self.config = ConfigLoader()   # Automatically ensures that whenever you create ModelLoader, it loads the config.. model_post_init is a Pydantic V2 hook, which runs after model creation.It assigns a ConfigLoader() instance to self.config.This ensures the configuration is loaded whenever you create a ModelLoader.
 
     class Config:
         arbitrary_types_allowed = True  # Allows ConfigLoader (a non-Pydantic class) to be used as a field in the model.
@@ -64,6 +65,12 @@ class ModelLoader(BaseModel):
             api_key = os.getenv("OPENAI_API_KEY")
             model_name = self.config["embedding_model"]["openai"]["model_name"]
             llm = OpenAIEmbeddings(model=model_name, api_key = api_key)
+        elif self.model_provider =="huggingface":
+            load_dotenv()
+            print("Loading model from huggingface:")
+            api_key = os.getenv("HF_TOKEN")
+            model_name = self.config["embedding_model"]["huggingface"]["model_name"]
+            llm = HuggingFaceEmbeddings(model=model_name)
         else: 
             raise ValueError(f"Unsupported model provider: {self.model_provider}")
         return llm
