@@ -27,8 +27,6 @@ class FileLoader:
             - Insurance
             - Legal/Compliance
             - Financial/Regulatory
-            - Government/Public Policy
-            - Technical/IT Policies
             - Healthcare 
 
             Respond strictly in JSON that matches the schema.

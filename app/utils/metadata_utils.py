@@ -35,11 +35,22 @@ class MetadataService:
     
     @classmethod
     def Return_document_model(result):
+        """Return the appropriate metadata model class based on the document type.
+            - HR/Employment
+            - Insurance
+            - Legal/Compliance
+            - Financial/Regulatory
+            - Healthcare 
+        """
         if result.document_types == "Insurance":
             return InsuranceMetadata
         elif result.document_types == "Healthcare":
             return HealthcareMetadata
-        elif result.document_types == "Legal":
+        elif result.document_types == "Legal/Compliance":
             return LegalMetadata
+        elif result.document_types == "Financial/Regulatory":
+            return FinancialMetadata
+        elif result.document_types == "HR/Employment":
+            return HRMetadata
         else:
             return None
