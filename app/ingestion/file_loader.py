@@ -3,10 +3,9 @@ from langchain_community.document_loaders import PyMuPDFLoader
 import os
 from langchain_community.document_loaders import Docx2txtLoader
 import tempfile
-from app.utils.model_loader import ModelLoader
 from app.schemas.request_models import DocumentTypeSchema
 from langchain_core.documents import Document
-from typing import List, Dict, Literal
+from typing import List
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import PydanticOutputParser
 

@@ -12,7 +12,7 @@ from pydantic import BaseModel
 
 class MetadataExtractor:
 
-    def extractInsuranceMetadata_query(llm , metadata_class : Type[BaseModel],document: Document, known_keywords: dict) -> BaseModel:
+    def extractMetadata_query(self, llm , metadata_class : Type[BaseModel],document: Document, known_keywords: dict) -> BaseModel:
         parser = PydanticOutputParser(pydantic_object=metadata_class)
 
         schema_str = json.dumps(metadata_class.model_json_schema(), indent=2)
@@ -53,7 +53,7 @@ class MetadataExtractor:
             print(f"⚠️ Parser failed on doc {document.metadata.get('source')} | error: {e}")
             return metadata_class(added_new_keyword=False)
     
-    def extractInsuranceMetadata(self, llm , metadata_class : Type[BaseModel], document: Document, known_keywords: dict) -> BaseModel:
+    def extractMetadata(self, llm , metadata_class : Type[BaseModel], document: Document, known_keywords: dict) -> BaseModel:
         parser = PydanticOutputParser(pydantic_object=metadata_class)
 
         schema_str = json.dumps(metadata_class.model_json_schema(), indent=2)

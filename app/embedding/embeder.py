@@ -1,22 +1,12 @@
 import os
 from dotenv import load_dotenv
-from app.schemas.request_models import QuerySpec
 from typing import Union, List
 
+class QueryEmbedding:
+    def __init__(self, query: str, embedding_model):
+        self.query = query
+        self.embedding_model = embedding_model
 
-def get_query_embedding(query_spec: QuerySpec, embedding_model):
-    # load_dotenv()
-    # model_loader = ModelLoader(model_provider="openai")
-    # embedding_client = model_loader.load_llm()
-    q = query_spec.raw_query
-    e_main =  embedding_model.embed_query(q)
-    expansions = []
-    if "procedure" in query_spec.entities:
-        procedure_value = query_spec.entities['procedure']
-        # Handle both string and list values
-        if isinstance(procedure_value, list):
-            procedure_str = ", ".join(procedure_value)
-        else:
-            procedure_str = procedure_value
-        expansions.append(f"{q} OR {procedure_str} procedures related")
-    return e_main,expansions
+    def get_embedding(self):
+        e_main = self.embedding_model.embed_query(self.query)
+        return e_main

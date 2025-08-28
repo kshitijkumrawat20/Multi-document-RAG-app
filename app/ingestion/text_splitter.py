@@ -1,6 +1,5 @@
 from langchain_core.documents import Document
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain.prompts import PromptTemplate
 from uuid import uuid4
 from typing import List, Dict
 import os 

@@ -32,7 +32,7 @@ def verify_bearer_token(authorization: Optional[str] = Header(None)):
     return True
 
 @app.post("/api/v1/hackrx/run", response_model=APIResponse)
-async def run_hackrx(request: HackRxRunRequest , authorized: bool = Depends(verify_bearer_token)):
+async def run_hackrx(request: HackRxRunRequest ): #, authorized: bool = Depends(verify_bearer_token)
     ## model initialisation 
     # LLM
     model_loader = ModelLoader(model_loader= "gemini")
