@@ -5,9 +5,13 @@ from typing import List, Dict
 import os 
 import json
 from app.utils.metadata_utils import MetadataService
+from app.metadata_extraction.metadata_ext import MetadataExtractor
+
 class splitting_text:
-    
-    
+    def __init__(self, llm = None):
+        self.llm = llm 
+        self.metadata_extractor = MetadataExtractor(llm = self.llm)
+
     def _clean_text(self, text:str)-> str: 
         """Clean extracted page content"""
         # remove excessive whitespace 
@@ -15,7 +19,7 @@ class splitting_text:
         return text
 
     def text_splitting(self,metadata_extractor, doc: List[Document]) -> List[Document]:
-        
+        """Split document into chunks for processing"""
 
         all_chunks = []
         splitter = RecursiveCharacterTextSplitter(chunk_size=800, chunk_overlap=100)
@@ -35,7 +39,7 @@ class splitting_text:
 
             if i == 0:
                 # First page → extract + create JSON
-                Document_metadata = metadata_extractor(page, known_keywords={})
+                Document_metadata = self.metadata_extractor.extractMetadata(page, known_keywords={})
                 extracted = Document_metadata.model_dump()
                 normalized = MetadataService.normalize_dict_to_lists(extracted)
 
@@ -48,11 +52,11 @@ class splitting_text:
                 with open(output_path, "r") as f:
                     known_keywords = json.load(f)
 
-                Document_metadata = metadata_extractor(page, known_keywords)
+                Document_metadata = self.metadata_extractor.extractMetadata(page, known_keywords)
 
                 # check if there is new keyword is added or not during metadata extraction if yes then normalise(convert to dict) and then add new values into the keys exist
                 if Document_metadata.added_new_keyword:
-                    new_data = metadata_extractor(
+                    new_data = self.metadata_extractor.extractMetadata(
                         Document_metadata.model_dump(exclude_none= True)
                     )
                     for key,vals in new_data.items():

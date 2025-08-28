@@ -11,8 +11,10 @@ from pydantic import BaseModel
 
 
 class MetadataExtractor:
+    def __init__(self, llm = None):
+        self.llm = llm
 
-    def extractMetadata_query(self, llm , metadata_class : Type[BaseModel],document: Document, known_keywords: dict) -> BaseModel:
+    def extractMetadata_query(self, metadata_class : Type[BaseModel],document: Document, known_keywords: dict) -> BaseModel:
         parser = PydanticOutputParser(pydantic_object=metadata_class)
 
         schema_str = json.dumps(metadata_class.model_json_schema(), indent=2)
@@ -40,7 +42,7 @@ class MetadataExtractor:
             """),
             ("human", "Text:\n{document_content}")
         ])
-        chain = prompt | llm | parser
+        chain = prompt | self.llm | parser
 
         try:
             result = chain.invoke({
@@ -53,7 +55,7 @@ class MetadataExtractor:
             print(f"⚠️ Parser failed on doc {document.metadata.get('source')} | error: {e}")
             return metadata_class(added_new_keyword=False)
     
-    def extractMetadata(self, llm , metadata_class : Type[BaseModel], document: Document, known_keywords: dict) -> BaseModel:
+    def extractMetadata(self, metadata_class : Type[BaseModel], document: Document, known_keywords: dict) -> BaseModel:
         parser = PydanticOutputParser(pydantic_object=metadata_class)
 
         schema_str = json.dumps(metadata_class.model_json_schema(), indent=2)
@@ -86,7 +88,7 @@ class MetadataExtractor:
         #     - New keywords must be short (1–3 words).
         #     - Do NOT invent different variations (e.g., if "Medical" already exists, do not output "Mediclaim Plus").
         #     - For list fields (like exclusions), reuse existing keywords where possible.
-        chain = prompt | llm | parser
+        chain = prompt | self.llm | parser
 
         try:
             result = chain.invoke({
