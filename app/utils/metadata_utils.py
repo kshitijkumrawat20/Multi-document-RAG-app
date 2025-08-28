@@ -1,4 +1,4 @@
-
+from app.schemas.metadata_schema import InsuranceMetadata, LegalMetadata, ProcurementMetadata, FinancialMetadata, HRMetadata,HealthcareMetadata
 class MetadataService:
     
     @staticmethod
@@ -32,3 +32,14 @@ class MetadataService:
             else:
                 normalized[key] = [value]
         return normalized
+    
+    @classmethod
+    def Return_document_model(result):
+        if result.document_types == "Insurance":
+            return InsuranceMetadata
+        elif result.document_types == "Healthcare":
+            return HealthcareMetadata
+        elif result.document_types == "Legal":
+            return LegalMetadata
+        else:
+            return None

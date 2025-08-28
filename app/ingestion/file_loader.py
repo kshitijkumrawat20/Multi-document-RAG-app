@@ -7,6 +7,7 @@ from langchain_core.documents import Document
 from typing import List
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import PydanticOutputParser
+from app.schemas.metadata_schema import InsuranceMetadata, HRMetadata, LegalMetadata, FinancialMetadata, DocumentTypeSchema
 
 class FileLoader:
     def __init__(self, llm=None):
@@ -28,6 +29,7 @@ class FileLoader:
             - Financial/Regulatory
             - Government/Public Policy
             - Technical/IT Policies
+            - Healthcare 
 
             Respond strictly in JSON that matches the schema.
 

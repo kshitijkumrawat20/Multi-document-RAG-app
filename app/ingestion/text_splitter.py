@@ -6,11 +6,16 @@ import os
 import json
 from app.utils.metadata_utils import MetadataService
 from app.metadata_extraction.metadata_ext import MetadataExtractor
-
+from pydantic import BaseModel
+from typing import Type
+from app.utils.metadata_utils import MetadataService
 class splitting_text:
-    def __init__(self, llm = None):
+    def __init__(self, documentTypeSchema:Type[BaseModel], llm=None):
         self.llm = llm 
         self.metadata_extractor = MetadataExtractor(llm = self.llm)
+        self.metadata_services = MetadataService()
+        self.documentTypeSchema = documentTypeSchema
+        self.Keywordsfile_path = None
 
     def _clean_text(self, text:str)-> str: 
         """Clean extracted page content"""
@@ -18,7 +23,7 @@ class splitting_text:
         text = " ".join(text.split())
         return text
 
-    def text_splitting(self,metadata_extractor, doc: List[Document]) -> List[Document]:
+    def text_splitting(self, doc: List[Document]) -> List[Document]:
         """Split document into chunks for processing"""
 
         all_chunks = []
@@ -33,13 +38,15 @@ class splitting_text:
                         
                     # text = self._clean_text(text)
 
-            output_folder = "app/data/"
-            filename = page.metadata['source'].replace(".","").replace("\\","")+ ".json"
-            output_path = os.path.join(output_folder, filename)
+            
 
             if i == 0:
+                output_folder = "app/data/"
+                filename = page.metadata['source'].replace(".","").replace("\\","")+ ".json"
+                output_path = os.path.join(output_folder, filename)
+                self.Keywordsfile_path = output_path
                 # First page → extract + create JSON
-                Document_metadata = self.metadata_extractor.extractMetadata(page, known_keywords={})
+                Document_metadata = self.metadata_extractor.extractMetadata(document=page, known_keywords={}, metadata_class=self.documentTypeSchema)
                 extracted = Document_metadata.model_dump()
                 normalized = MetadataService.normalize_dict_to_lists(extracted)
 
@@ -49,20 +56,20 @@ class splitting_text:
 
             else:
                 # Next pages → load JSON and enforce consistency
-                with open(output_path, "r") as f:
+                with open(self.Keywordsfile_path, "r") as f:
                     known_keywords = json.load(f)
 
-                Document_metadata = self.metadata_extractor.extractMetadata(page, known_keywords)
+                Document_metadata = self.metadata_extractor.extractMetadata(document=page, known_keywords=known_keywords, metadata_class=self.documentTypeSchema)
 
                 # check if there is new keyword is added or not during metadata extraction if yes then normalise(convert to dict) and then add new values into the keys exist
                 if Document_metadata.added_new_keyword:
-                    new_data = self.metadata_extractor.extractMetadata(
-                        Document_metadata.model_dump(exclude_none= True)
-                    )
+                    new_data = self.metadata_services.normalize_dict_to_lists(
+                    Document_metadata.model_dump(exclude_none= True)
+                )
                     for key,vals in new_data.items():
                         if isinstance(vals,list):
                             known_keywords[key] = list(set(known_keywords.get(key,[]) + vals))  #get the existing key and add vals and convert into set then list and update the file.
-                    with open(output_path, "w") as f:
+                    with open(self.Keywordsfile_path, "w") as f:
                         json.dump(known_keywords, f, indent=4)
 
             # print(f"Document_metadata type: {type(Document_metadata)}")
