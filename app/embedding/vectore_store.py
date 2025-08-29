@@ -7,10 +7,12 @@ from datetime import datetime
 from uuid import uuid4
 
 class VectorStore:
-    def __init__(self):
+    def __init__(self, text_chunks, embedding_model):
+        self.text_chunks = text_chunks
         self.current_time = datetime.now()
+        self.embedding_model = embedding_model
 
-    def create_vectore_store(self,text_chunks:list, embedding_model):
+    def create_vectore_store(self):
         load_dotenv()
         pinecone_key = os.getenv("PINECONE_API_KEY")
         pc = Pinecone(api_key=pinecone_key)
@@ -28,10 +30,10 @@ class VectorStore:
         index = pc.Index(index_name)
         # model_loader = ModelLoader(model_provider="openai")
         # embedding_model = model_loader.load_llm()
-        uuids = [str(uuid4()) for _ in range(len(text_chunks)) ]
-        vector_store = PineconeVectorStore(index = index, embedding=embedding_model)
+        uuids = [str(uuid4()) for _ in range(len(self.text_chunks)) ]
+        vector_store = PineconeVectorStore(index = index, embedding=self.embedding_model)
         name_space = f"hackrx-index{time_string}"
-        vector_store.add_documents(documents=text_chunks, ids = uuids,namespace = name_space )
+        vector_store.add_documents(documents=self.text_chunks, ids = uuids,namespace = name_space )
 
         return index, name_space
 

@@ -7,7 +7,7 @@ from langchain_core.documents import Document
 from typing import List
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import PydanticOutputParser
-from app.schemas.metadata_schema import InsuranceMetadata, HRMetadata, LegalMetadata, FinancialMetadata, DocumentTypeSchema
+from app.schemas.request_models import  DocumentTypeSchema
 
 class FileLoader:
     def __init__(self, llm=None):

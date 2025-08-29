@@ -20,7 +20,7 @@ class ConfigLoader:
     
 
 class ModelLoader(BaseModel):
-    model_provider: Literal["groq", "gemini", "openai","gemini_lite"] = "gemini" 
+    model_provider: Literal["groq", "gemini", "openai","gemini_lite", "huggingface"] = "gemini" 
     config: Optional[ConfigLoader] = Field(default = None, exclude = True) # either the config is ConfigLoader object or None
 
     def model_post_init(self, __context: Any)->None:

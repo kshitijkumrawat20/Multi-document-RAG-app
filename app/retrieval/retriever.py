@@ -1,7 +1,15 @@
 from app.schemas.request_models import ClauseHit
 
 class Retriever:
-    def retrieval_from_pinecone_vectoreStore(self, pinecone_index, embeddings, top_k= 3, filter_meta = None, namespace= None):
+    def __init__(self, pinecone_index, llm, query = None, metadata = None, namespace=None):
+        self.pinecone_index = pinecone_index
+        self.llm = llm
+        self.query = query
+        self.metadata = metadata
+        self.namespace = namespace
+
+
+    def retrieval_from_pinecone_vectoreStore(self, top_k= 3):
         """
         Retrieve the top matching chunks from Pinecone.
         
@@ -12,15 +20,15 @@ class Retriever:
             filter_meta: Optional metadata filter dict.
         
         Returns:
-            List of ClauseHit objects (lightweight container for chunk info).
+            List of documents stored in pinecone store.
         """
-        res = pinecone_index.query(
-            vector= embeddings,
+        res = self.pinecone_index.query(
+            vector= self.query,
             top_k =top_k ,
             include_metadata = True, 
             include_values = False, 
-            filter = filter_meta,
-            namespace = namespace
+            filter = self.metadata,
+            namespace = self.namespace
             )
         # hits= []
         # for match in res['matches']:

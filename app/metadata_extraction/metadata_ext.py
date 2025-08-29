@@ -24,16 +24,22 @@ class MetadataExtractor:
             ("system", """You are an information extraction system. 
             Extract only the required metadata from the user query using the existing known keywords. 
 
-            ⚠️ Rules for consistency:
+            ⚠️ CRITICAL FORMATTING RULES:
+            - ALL fields must be arrays/lists, even if there's only one value
+            - For single values, wrap in brackets: "doc_id": ["single_value"]
+            - For multiple values: "coverage_type": ["value1", "value2", "value3"]
+            - For null/empty fields, use: null (not empty arrays)
+            
+            ⚠️ Content Rules:
             - For exclusions and obligations, DO NOT copy full sentences. 
             - Instead, extract only concise normalized keywords (2–5 words max each).
             - Use existing keywords if they already exist in the provided list.
             - Prefer to reuse existing keywords if they are semantically the same.  
-            - If you find a new keyword that is a **sub-type** or **more specific variant** of an existing one, keep both:  
-            *reuse the closest match from existing keywords*, and also add the new one.  
-            - In that case, set `added_new_keyword=true`.
+            - If you find a new keyword that is a sub-type or more specific variant of an existing one, keep both:  
+            reuse the closest match from existing keywords, and also add the new one.  
+            - In that case, set added_new_keyword=true.
             - Do not include raw paragraphs in the output.
-            
+             
             Schema you must follow:
             {schema}
 
@@ -65,7 +71,13 @@ class MetadataExtractor:
             ("system", """You are an information extraction system. 
             Extract only the required metadata from the text according to schema given below. 
 
-            ⚠️ Rules for consistency:
+            ⚠️ CRITICAL FORMATTING RULES:
+            - ALL fields must be arrays/lists, even if there's only one value
+            - For single values, wrap in brackets: "doc_id": ["single_value"]
+            - For multiple values: "coverage_type": ["value1", "value2", "value3"]
+            - For null/empty fields, use: null (not empty arrays)
+            
+            ⚠️ Content Rules:
             - For exclusions and obligations, DO NOT copy full sentences. 
             - Instead, extract only concise normalized keywords (2–5 words max each).
             - Use existing keywords if they already exist in the provided list.

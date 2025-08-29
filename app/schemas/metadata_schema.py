@@ -3,7 +3,7 @@ from typing import List, Dict, Any, Optional, Union, Literal
 
 class CommonMetaData(BaseModel):
     # --- Common metadata (across all domains) ---
-    doc_id: Optional[str] = Field(None, description="Unique document identifier")
+    doc_id: Optional[List[str]] = Field(None, description="Unique document identifier")
     doc_category: Optional[List[str]] = Field(None, description="General pool/category e.g. Insurance, HR, Legal")
     doc_type: Optional[List[str]] = Field(None, description="Specific type e.g. Policy doc, Contract, Handbook")
     jurisdiction: Optional[List[str]] = Field(

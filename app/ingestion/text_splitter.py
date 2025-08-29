@@ -48,7 +48,7 @@ class splitting_text:
                 # First page → extract + create JSON
                 Document_metadata = self.metadata_extractor.extractMetadata(document=page, known_keywords={}, metadata_class=self.documentTypeSchema)
                 extracted = Document_metadata.model_dump()
-                normalized = MetadataService.normalize_dict_to_lists(extracted)
+                normalized = MetadataService.normalize_dict_to_lists(metadata = extracted)
 
                 with open(output_path, "w") as f:
                     json.dump(normalized, f, indent=4)
