@@ -1,6 +1,22 @@
-from pydantic import BaseModel, model_validator,field_validator
+from pydantic import BaseModel
 from typing import List, Dict, Any, Optional
-import json
-from app.schemas.request_models import QuerySpec, LogicResult
-class APIResponse(BaseModel):
-    answers : List
+class QueryResponse(BaseModel): 
+    session_id: str 
+    query: str
+    answer: str
+    message: str
+
+class SessionResponse(BaseModel):
+    session_id: str
+    message: str 
+
+class UploadResponse(BaseModel):
+    session_id: str
+    filename: str
+    document_type: str
+    chunks_created: int 
+    message: str 
+
+class ErrorResponse(BaseModel):
+    detail: str
+    error_code: Optional[str] = None
