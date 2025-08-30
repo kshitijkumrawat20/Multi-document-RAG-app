@@ -1,0 +1,123 @@
+{
+    "doc_id": [
+        "NICHLIP25039V032425"
+    ],
+    "doc_category": [
+        "Insurance"
+    ],
+    "doc_type": [
+        "Mediclaim Policy",
+        "Health Insurance Policy",
+        "National Parivar Mediclaim Plus Policy"
+    ],
+    "jurisdiction": [
+        "India"
+    ],
+    "effective_date": [],
+    "expiry_date": [],
+    "parties": [
+        "patient",
+        "Insurer",
+        "New Born Baby",
+        "Hospital",
+        "Non Network Provider",
+        "Medical Practitioner",
+        "Family members (spouse, children, parents)",
+        "Insured Persons",
+        "Qualified Nurse",
+        "Network Provider",
+        "dental practitioner",
+        "Psychiatrist",
+        "TPA",
+        "Proposer",
+        "Insured family",
+        "National Insurance Company Ltd."
+    ],
+    "obligations": [
+        "make records accessible",
+        "require hospitalisation",
+        "intimate claim to Company or TPA",
+        "bear co-payment percentage",
+        "suffer illness or injury",
+        "pay premium",
+        "continuously renew policy",
+        "apply for insurance",
+        "maintain patient records",
+        "indemnify reasonable charges"
+    ],
+    "penalties": [],
+    "notes": [
+        "Page 4 of 25",
+        "Page 5 of 25",
+        "CIN - U10200WB1906GOI001713",
+        "Premises No. 18-0374, Plot no. CBD-81, New Town, Kolkata - 700156",
+        "Page 3 of 25",
+        "IRDAI Regn. No. \u2013 58",
+        "Page 2 of 25"
+    ],
+    "policy_number": [
+        "18-0374"
+    ],
+    "coverage_type": [
+        "surgical appliances",
+        "Dental treatment due to injury",
+        "Vitamins and tonics",
+        "Dental Treatment",
+        "Prosthetics and devices",
+        "Mediclaim",
+        "operation theatre charges",
+        "Plastic surgery",
+        "PPN package treatment",
+        "Pre Hospitalisation",
+        "Day Care Treatment",
+        "In-Patient Care",
+        "Post Hospitalisation",
+        "Cashless Facility",
+        "Intensive Care Unit coverage",
+        "oxygen",
+        "Treatment for hazardous sports injury",
+        "Hospitalisation",
+        "blood",
+        "Diagnostic procedures",
+        "Circumcision",
+        "cashless packaged pricing",
+        "Cataract Surgery",
+        "Domiciliary Hospitalisation",
+        "Medicines and drugs",
+        "Hormone replacement therapy",
+        "AYUSH Treatment",
+        "Surgery or Surgical Procedure",
+        "Anaesthesia",
+        "Room charges"
+    ],
+    "premium_amount": [],
+    "exclusions": [
+        "External Congenital Anomaly",
+        "Congenital anomaly",
+        "Diarrhoea and dysenteries",
+        "Pyrexia of unknown origin",
+        "experimental treatment",
+        "Chronic nephritis and nephritic syndrome",
+        "alternative treatment",
+        "no premium received",
+        "Internal Congenital Anomaly",
+        "Treatment less than three days",
+        "psychiatric or psychosomatic disorders",
+        "Influenza, cough and cold",
+        "Bronchitis",
+        "unproven treatment",
+        "Asthma",
+        "cosmetic surgery",
+        "dental implants",
+        "Epilepsy",
+        "waiting period",
+        "pre-existing disease",
+        "maternity or infertility expenses",
+        "out-patient treatment",
+        "Tonsillitis and respiratory infection",
+        "Arthritis, gout and rheumatism"
+    ],
+    "added_new_keyword": [
+        true
+    ]
+}

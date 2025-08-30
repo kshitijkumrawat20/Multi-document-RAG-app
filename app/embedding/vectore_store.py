@@ -12,7 +12,7 @@ class VectorStore:
         self.current_time = datetime.now()
         self.embedding_model = embedding_model
 
-    def create_vectore_store(self):
+    def create_vectorestore(self):
         load_dotenv()
         pinecone_key = os.getenv("PINECONE_API_KEY")
         pc = Pinecone(api_key=pinecone_key)

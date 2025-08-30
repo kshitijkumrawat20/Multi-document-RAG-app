@@ -1,9 +1,8 @@
 from app.schemas.request_models import ClauseHit
 
 class Retriever:
-    def __init__(self, pinecone_index, llm, query = None, metadata = None, namespace=None):
+    def __init__(self, pinecone_index, query = None, metadata = None, namespace=None):
         self.pinecone_index = pinecone_index
-        self.llm = llm
         self.query = query
         self.metadata = metadata
         self.namespace = namespace
