@@ -1,4 +1,4 @@
-from app.schemas.request_models import ClauseHit
+# from app.schemas.request_models import ClauseHit
 
 class Retriever:
     def __init__(self, pinecone_index, query = None, metadata = None, namespace=None):
@@ -19,7 +19,7 @@ class Retriever:
             filter_meta: Optional metadata filter dict.
         
         Returns:
-            List of documents stored in pinecone store.
+            List of ClauseHit objects (lightweight container for chunk info).
         """
         res = self.pinecone_index.query(
             vector= self.query,
@@ -29,16 +29,26 @@ class Retriever:
             filter = self.metadata,
             namespace = self.namespace
             )
-        # hits= []
-        # for match in res['matches']:
-        #     hits.append(ClauseHit(
-        #         doc_id=match['metadata']['doc_id'],
-        #         page=match['metadata'].get('page', -1),
-        #         chunk_id=match['metadata'].get('chunk_id', ''),
-        #         text=match['metadata']['text'],
-        #         metadata=match['metadata'],
-        #         score=match['score']
-        #     ))
-        # return hits
-        return res
+        
+        # Process the results into the expected format
+        class ClauseHit:
+            def __init__(self, doc_id, page, chunk_id, text, metadata, score):
+                self.doc_id = doc_id
+                self.page = page
+                self.chunk_id = chunk_id
+                self.text = text
+                self.metadata = metadata
+                self.score = score
+        
+        hits = []
+        for match in res['matches']:
+            hits.append(ClauseHit(
+                doc_id=match['metadata'].get('doc_id', ''),
+                page=match['metadata'].get('page_no', -1),  # Use page_no instead of page
+                chunk_id=match['metadata'].get('chunk_id', ''),
+                text=match['metadata'].get('text', match.get('text', '')),
+                metadata=match['metadata'],
+                score=match['score']
+            ))
+        return hits
     

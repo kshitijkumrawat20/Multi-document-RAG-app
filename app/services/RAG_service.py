@@ -127,6 +127,7 @@ class RAGService:
             f'{i+1}. (DocID: {c.doc_id}, Page: {c.page}) "{c.text[:200]}..."' 
             for i, c in enumerate(top_clauses)
         ]
+        print(f"context_clauses: {context_clauses}")
 
         prompt = f"""
         You are a legal/insurance domain expert and policy analyst. 
@@ -139,4 +140,11 @@ class RAGService:
         print("[RAGService] Invoking LLM with prompt...")
         response = self.llm.invoke(prompt)
         print(f"[RAGService] LLM response: {response}")
-        return response
+        
+        # Extract string content from response object
+        if hasattr(response, 'content'):
+            return response.content
+        elif isinstance(response, str):
+            return response
+        else:
+            return str(response)
