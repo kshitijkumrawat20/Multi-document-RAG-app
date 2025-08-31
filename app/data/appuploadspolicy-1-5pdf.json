@@ -1,0 +1,94 @@
+{
+    "doc_id": [
+        "NICHLIP25039V032425"
+    ],
+    "doc_category": [
+        "Insurance"
+    ],
+    "doc_type": [
+        "Policy Document",
+        "Mediclaim Policy"
+    ],
+    "jurisdiction": [
+        "India"
+    ],
+    "effective_date": [],
+    "expiry_date": [],
+    "parties": [
+        "National Insurance Company Ltd.",
+        "Insured",
+        "Insured Persons",
+        "New Born Baby",
+        "Network Provider",
+        "Proposer",
+        "Insured Person",
+        "Third Party Administrator (TPA)",
+        "Family members",
+        "Non Network Provider",
+        "Medical Practitioner"
+    ],
+    "penalties": [],
+    "notes": [],
+    "policy_number": [
+        "NICHLIP25039V032425"
+    ],
+    "coverage_type": [
+        "In-patient Treatment",
+        "Day Care Treatment",
+        "Mediclaim",
+        "AYUSH Treatment",
+        "Intensive Care Unit",
+        "Vitamins and tonics for treatment",
+        "Pre Hospitalisation",
+        "Post Hospitalisation",
+        "Dental treatment due to injury",
+        "Hazardous sports treatment",
+        "internal surgical implants",
+        "Hormone replacement therapy",
+        "Dental Treatment",
+        "Hospitalisation",
+        "Circumcision for treatment",
+        "In-Patient Care",
+        "Diagnostic procedures",
+        "Plastic surgery due to disease or injury",
+        "Cataract Surgery",
+        "Surgery or Surgical Procedure",
+        "Domiciliary Hospitalisation"
+    ],
+    "premium_amount": [],
+    "exclusions": [
+        "Asthma in domiciliary hospitalization",
+        "cosmetic surgery",
+        "infertility domiciliary expenses",
+        "Nephritic syndrome in domiciliary hospitalization",
+        "Influenza in domiciliary hospitalization",
+        "domiciliary treatment less than three days",
+        "Rheumatism in domiciliary hospitalization",
+        "Dysenteries in domiciliary hospitalization",
+        "alternative domiciliary treatment",
+        "Pharingitis in domiciliary hospitalization",
+        "Diarrhoea in domiciliary hospitalization",
+        "implants",
+        "Psychosomatic disorders in domiciliary hospitalization",
+        "Unproven/ Experimental Treatment",
+        "Pre existing disease",
+        "Gout in domiciliary hospitalization",
+        "Tonsillitis in domiciliary hospitalization",
+        "Bronchitis in domiciliary hospitalization",
+        "Epilepsy in domiciliary hospitalization",
+        "Chronic nephritis in domiciliary hospitalization",
+        "Waiting Period",
+        "maternity domiciliary expenses",
+        "Psychiatric disorders in domiciliary hospitalization",
+        "out-patient treatment",
+        "Upper respiratory tract infection in domiciliary hospitalization",
+        "Gastroenteritis in domiciliary hospitalization",
+        "Cough and cold in domiciliary hospitalization",
+        "Arthritis in domiciliary hospitalization",
+        "Laryngitis in domiciliary hospitalization",
+        "Pyrexia of unknown origin in domiciliary hospitalization"
+    ],
+    "added_new_keyword": [
+        true
+    ]
+}

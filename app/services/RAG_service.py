@@ -118,15 +118,17 @@ class RAGService:
     def answer_query(self, raw_query:str) -> str:
         """Answer user query using retrieved documents and LLM"""
         print(f"[RAGService] Answering query: {raw_query}")
-        top_clauses = self.result
-        if not top_clauses:
-            print("[RAGService] No relevant information found in the document.")
-            return "No relevant information found in the document."
+        top_clause = self.result['matches']
+        top_clause_dicts = [r.to_dict() for r in top_clause]
+        self.top_clauses = top_clause_dicts
+        keys_to_remove = {"file_path", "source", "producer", "keywords", "subject", "added_new_keyword", "author", "chunk_id"}
+        for r in top_clause_dicts:
+            meta = r.get("metadata", {})
+            for k in keys_to_remove:
+                meta.pop(k, None)
 
-        context_clauses = [
-            f'{i+1}. (DocID: {c.doc_id}, Page: {c.page}) "{c.text[:200]}..."' 
-            for i, c in enumerate(top_clauses)
-        ]
+        context_clauses = json.dumps(top_clause_dicts, separators=(",", ":"))
+
         print(f"context_clauses: {context_clauses}")
 
         prompt = f"""

@@ -31,24 +31,25 @@ class Retriever:
             )
         
         # Process the results into the expected format
-        class ClauseHit:
-            def __init__(self, doc_id, page, chunk_id, text, metadata, score):
-                self.doc_id = doc_id
-                self.page = page
-                self.chunk_id = chunk_id
-                self.text = text
-                self.metadata = metadata
-                self.score = score
+        # class ClauseHit:
+        #     def __init__(self, doc_id, page, chunk_id, text, metadata, score):
+        #         self.doc_id = doc_id
+        #         self.page = page
+        #         self.chunk_id = chunk_id
+        #         self.text = text
+        #         self.metadata = metadata
+        #         self.score = score
         
-        hits = []
-        for match in res['matches']:
-            hits.append(ClauseHit(
-                doc_id=match['metadata'].get('doc_id', ''),
-                page=match['metadata'].get('page_no', -1),  # Use page_no instead of page
-                chunk_id=match['metadata'].get('chunk_id', ''),
-                text=match['metadata'].get('text', match.get('text', '')),
-                metadata=match['metadata'],
-                score=match['score']
-            ))
-        return hits
+        # hits = []
+        # for match in res['matches']:
+        #     hits.append(ClauseHit(
+        #         doc_id=match['metadata'].get('doc_id', ''),
+        #         page=match['metadata'].get('page_no', -1),  # Use page_no instead of page
+        #         chunk_id=match['metadata'].get('chunk_id', ''),
+        #         text=match['metadata'].get('text', match.get('text', '')),
+        #         metadata=match['metadata'],
+        #         score=match['score']
+        #     ))
+        # return hits
+        return res
     

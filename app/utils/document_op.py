@@ -1,3 +1,4 @@
+import os
 class DocumentOperation:
     @staticmethod
     def get_file_type_by_extension(filename):
