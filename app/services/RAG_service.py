@@ -10,6 +10,19 @@ from app.utils.metadata_utils import MetadataService
 # from app.utils.document_op import DocumentOperation
 from langchain_core.documents import Document
 import json
+from typing import List, Optional
+# ...existing imports...
+
+# Global model instances (loaded once)
+_embedding_model = None
+
+def get_models():
+    global  _embedding_model
+    if _embedding_model is None:
+        print("Loading models (one-time initialization)...")
+        embedding_loader = ModelLoader(model_provider="huggingface")
+        _embedding_model = embedding_loader.load_llm()
+    return _embedding_model
 
 class RAGService: 
     def __init__(self):
@@ -36,8 +49,8 @@ class RAGService:
         self.llm = self.model_loader.load_llm()
         print("[RAGService] LLM model loaded.")
         print("[RAGService] Loading embedding model (huggingface)...")
-        self.model_loader = ModelLoader(model_provider="huggingface")
-        self.embedding_model = self.model_loader.load_llm()
+        # self.model_loader = ModelLoader(model_provider="huggingface")
+        self.embedding_model = get_models()
         print("[RAGService] Embedding model loaded.")
 
     def load_and_split_document(self, type:str, path:str= None, url:str = None):

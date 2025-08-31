@@ -7,7 +7,7 @@ from pathlib import Path
 from app.core.session_manager import SessionManager, Session, session_manager
 from app.services.RAG_service import RAGService
 from app.schemas.request_models import QueryRequest
-from app.schemas.response_models import SessionResponse, QueryResponse,UploadResponse
+from app.schemas.response_models import SessionResponse, QueryResponse, UploadResponse, SourceDocument
 from app.config.config import get_settings
 
 router = APIRouter()
@@ -205,11 +205,30 @@ async def query_document(
 
         # generate answer
         answer = session.rag_service.answer_query(query_request.query)
+        
+        # Extract query metadata and sources for UI
+        query_metadata = getattr(session.rag_service, 'query_metadata', {})
+        
+        # Extract source documents from results
+        sources = []
+        if hasattr(session.rag_service, 'result') and session.rag_service.result:
+            matches = session.rag_service.result.get('matches', [])
+            for match in matches[:3]:  # Top 3 sources
+                metadata = match.get('metadata', {})
+                sources.append(SourceDocument(
+                    doc_id=metadata.get('doc_id', match.get('id', '')),
+                    page=metadata.get('page_no', metadata.get('page', 0)),
+                    text=metadata.get('text', ''),
+                    score=match.get('score', 0.0),
+                    metadata=metadata
+                ))
 
         return QueryResponse(
             session_id=session_id,
             query=query_request.query,
             answer=answer,
+            query_metadata=query_metadata,
+            sources=sources,
             message="Query processed successfully"
         )
         

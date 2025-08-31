@@ -1,0 +1,89 @@
+{
+    "doc_id": [
+        "NICHLIP25039V032425"
+    ],
+    "doc_category": [
+        "Insurance"
+    ],
+    "doc_type": [
+        "Policy Document"
+    ],
+    "jurisdiction": [
+        "India"
+    ],
+    "effective_date": [],
+    "expiry_date": [],
+    "parties": [
+        "Company",
+        "insurer",
+        "Network Provider",
+        "Medical Practitioner",
+        "TPA",
+        "Patient",
+        "Insured Person",
+        "Non Network Provider",
+        "Insured Persons",
+        "Proposer",
+        "policyholders",
+        "National Insurance Company Ltd.",
+        "Insured"
+    ],
+    "penalties": [],
+    "notes": [
+        "IRDAI Regn. No. \u2013 58",
+        "CIN - U10200WB1906GOI001713"
+    ],
+    "policy_number": [
+        "18-0374"
+    ],
+    "coverage_type": [
+        "plastic surgery due to disease or injury",
+        "circumcision for treatment",
+        "internal implants during surgery",
+        "In-patient Treatment",
+        "Mediclaim",
+        "pre hospitalisation",
+        "In-Patient Care",
+        "hazardous/adventure sports treatment",
+        "Hospitalisation",
+        "AYUSH Treatment",
+        "post hospitalisation",
+        "cataract surgery",
+        "Domiciliary Hospitalisation",
+        "hormone replacement therapy",
+        "dental treatment due to injury",
+        "Day Care Treatment",
+        "vitamins and tonics for treatment",
+        "Diagnostic procedures",
+        "Surgery or Surgical Procedure"
+    ],
+    "premium_amount": [],
+    "exclusions": [
+        "waiting period",
+        "internal congenital anomaly",
+        "external congenital anomaly",
+        "maternity or infertility",
+        "asthma",
+        "cosmetic surgery",
+        "implants",
+        "alternative treatment",
+        "epilepsy",
+        "diarrhoea and dysenteries",
+        "psychiatric/psychosomatic disorders",
+        "arthritis, gout, rheumatism",
+        "tonsillitis and URI",
+        "chronic nephritis and nephritic syndrome",
+        "congenital anomaly",
+        "pre-existing disease",
+        "bronchitis",
+        "unproven/experimental treatment",
+        "influenza, cough, cold",
+        "domiciliary treatment less than 3 days",
+        "disease in injury definition",
+        "pyrexia less than 10 days",
+        "out-patient treatment"
+    ],
+    "added_new_keyword": [
+        true
+    ]
+}
