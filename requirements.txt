@@ -8,4 +8,9 @@ langchain-pinecone
 fastapi 
 langchain-google-genai
 pydantic
-uvicorn 
+uvicorn
+streamlit
+python-magic
+python-docx
+aiofiles
+python-multipart 

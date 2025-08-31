@@ -1,8 +1,10 @@
 import streamlit as st
 import requests
 import json
-from typing import Optional
+from typing import Optional, List, Dict
 import time
+import os
+import magic  # For file type detection
 
 # Configuration
 API_BASE_URL = "http://localhost:8000/api/v1"
@@ -10,37 +12,94 @@ API_BASE_URL = "http://localhost:8000/api/v1"
 class RAGApp:
     def __init__(self):
         self.session_id: Optional[str] = None
+        self.username: str = "anonymous"
+        
+    def set_username(self, username: str):
+        """Set the username for the app"""
+        self.username = username
         
     def create_session(self) -> bool:
         """Create a new session with the API"""
         try:
-            response = requests.post(f"{API_BASE_URL}/session")
-            print(f"[STREAMLIT DEBUG] Session creation response status: {response.status_code}")
+            response = requests.post(f"{API_BASE_URL}/session", params={"username": self.username})
             if response.status_code == 200:
                 data = response.json()
                 self.session_id = data["session_id"]
                 st.session_state.session_id = self.session_id
-                print(f"[STREAMLIT DEBUG] Created session: {self.session_id}")
                 return True
         except Exception as e:
             st.error(f"Failed to create session: {e}")
         return False
     
-    def upload_document(self, file, doc_type: str) -> bool:
-        """Upload document to the API"""
+    def get_user_sessions(self) -> List[Dict]:
+        """Get all sessions for current user"""
         try:
-            print(f"[STREAMLIT DEBUG] Uploading with session: {self.session_id}")
-            files = {"file": (file.name, file.getvalue(), file.type)}
-            data = {"doc_type": doc_type}
-            
-            upload_url = f"{API_BASE_URL}/upload/{self.session_id}"
-            print(f"[STREAMLIT DEBUG] Upload URL: {upload_url}")
-            
-            response = requests.post(
-                upload_url,
-                files=files,
-                data=data
-            )
+            response = requests.get(f"{API_BASE_URL}/sessions/{self.username}")
+            if response.status_code == 200:
+                data = response.json()
+                return data.get("sessions", [])
+        except Exception as e:
+            st.error(f"Failed to get user sessions: {e}")
+        return []
+    
+    def restore_session(self, session_id: str) -> bool:
+        """Restore a session from database"""
+        try:
+            response = requests.post(f"{API_BASE_URL}/session/{session_id}/restore")
+            if response.status_code == 200:
+                self.session_id = session_id
+                st.session_state.session_id = session_id
+                return True
+        except Exception as e:
+            st.error(f"Failed to restore session: {e}")
+        return False
+    
+    def detect_file_type(self, file_content: bytes, filename: str) -> str:
+        """Detect file type from content and filename"""
+        # Try to detect from filename extension first
+        if filename.lower().endswith('.pdf'):
+            return 'pdf'
+        elif filename.lower().endswith(('.doc', '.docx')):
+            return 'word'
+        else:
+            # Try to detect from file content using python-magic
+            try:
+                file_type = magic.from_buffer(file_content, mime=True)
+                if 'pdf' in file_type:
+                    return 'pdf'
+                elif any(word_type in file_type for word_type in ['word', 'msword', 'document']):
+                    return 'word'
+            except:
+                pass
+        return 'unknown'
+    
+    def upload_document(self, file=None, url=None, doc_type=None) -> bool:
+        """Upload document to the API (file or URL)"""
+        try:
+            if file:
+                # Auto-detect file type if not provided
+                if not doc_type:
+                    file_content = file.getvalue()
+                    doc_type = self.detect_file_type(file_content, file.name)
+                    if doc_type == 'unknown':
+                        st.error("Could not detect file type. Please specify manually.")
+                        return False
+                
+                files = {"file": (file.name, file.getvalue(), file.type)}
+                data = {"doc_type": doc_type}
+                
+                response = requests.post(
+                    f"{API_BASE_URL}/upload/{self.session_id}",
+                    files=files,
+                    data=data
+                )
+            else:
+                # URL upload
+                data = {"url": url, "doc_type": doc_type or "pdf"}
+                response = requests.post(
+                    f"{API_BASE_URL}/upload/{self.session_id}",
+                    data=data
+                )
             
             if response.status_code == 200:
                 result = response.json()
@@ -83,6 +142,49 @@ class RAGApp:
             st.error(f"Status check error: {e}")
         return None
 
+def show_login_form():
+    """Show login/username form"""
+    st.title("🔐 Welcome to RAG Document Analysis")
+    st.markdown("Enter your username to continue with your sessions")
+    
+    with st.form("login_form"):
+        username = st.text_input("Username", value="anonymous", help="Enter your username to access your sessions")
+        submit = st.form_submit_button("Login")
+        
+        if submit and username:
+            st.session_state.username = username
+            st.session_state.logged_in = True
+            st.rerun()
+
+def show_session_selector(app: RAGApp):
+    """Show session selection interface"""
+    st.sidebar.header("📂 Your Sessions")
+    
+    # Get user sessions
+    sessions = app.get_user_sessions()
+    
+    if sessions:
+        st.sidebar.subheader("Existing Sessions")
+        for session in sessions:
+            col1, col2 = st.sidebar.columns([3, 1])
+            with col1:
+                session_label = f"{session['document_name'] or 'Untitled'} ({session['document_type']})"
+                st.sidebar.text(session_label)
+                st.sidebar.caption(f"Chunks: {session['chunks_count']} | {session['last_accessed']}")
+            with col2:
+                if st.sidebar.button("🔄", key=f"restore_{session['session_id']}", help="Restore this session"):
+                    if app.restore_session(session['session_id']):
+                        st.success(f"Restored session: {session_label}")
+                        st.rerun()
+    
+    st.sidebar.divider()
+    
+    # Create new session button
+    if st.sidebar.button("➕ Create New Session", type="primary"):
+        if app.create_session():
+            st.success("New session created!")
+            st.rerun()
+
 def main():
     st.set_page_config(
         page_title="RAG Document Analysis",
@@ -90,82 +192,109 @@ def main():
         layout="wide"
     )
     
-    st.title("📄 RAG Document Analysis System")
-    st.markdown("Upload your documents and ask questions about them!")
+    # Initialize session state
+    if 'logged_in' not in st.session_state:
+        st.session_state.logged_in = False
+    if 'username' not in st.session_state:
+        st.session_state.username = "anonymous"
+    if 'messages' not in st.session_state:
+        st.session_state.messages = []
+    
+    # Show login form if not logged in
+    if not st.session_state.logged_in:
+        show_login_form()
+        return
     
     # Initialize app
     if 'app' not in st.session_state:
         st.session_state.app = RAGApp()
     
     app = st.session_state.app
+    app.set_username(st.session_state.username)
     
     # Restore session ID if it exists in session state
     if hasattr(st.session_state, 'session_id') and st.session_state.session_id:
         app.session_id = st.session_state.session_id
     
-    # Sidebar for session management
-    with st.sidebar:
-        st.header("Session Management")
-        
-        # Create new session
-        if st.button("🔄 Create New Session"):
-            if app.create_session():
-                st.success("New session created!")
-                st.rerun()
-        
-        # Display current session
-        if hasattr(st.session_state, 'session_id') and st.session_state.session_id:
-            app.session_id = st.session_state.session_id
-            st.success(f"Session: {app.session_id[:8]}...")
-            
-            # Show session status
-            status = app.get_session_status()
-            if status:
-                st.json({
-                    "Document Uploaded": status["document_uploaded"],
-                    "Vector Store Created": status["vector_store_created"],
-                    "Document Info": status["document_info"]
-                })
-        else:
-            st.warning("No active session. Please create one.")
+    st.title("📄 RAG Document Analysis System")
+    st.markdown(f"Welcome back, **{st.session_state.username}**!")
+    
+    # Session management in sidebar
+    show_session_selector(app)
+    
+    # Logout button
+    if st.sidebar.button("🚪 Logout"):
+        st.session_state.logged_in = False
+        st.session_state.username = "anonymous"
+        st.session_state.clear()
+        st.rerun()
     
     # Main content area
     if not app.session_id:
-        st.info("👈 Please create a session first using the sidebar")
+        st.info("👈 Please create or select a session from the sidebar")
         return
+    
+    # Display current session info
+    st.success(f"Active Session: {app.session_id[:8]}...")
     
     # Document upload section
     st.header("📤 Document Upload")
     
-    col1, col2 = st.columns([2, 1])
+    # Upload type selection
+    upload_type = st.radio(
+        "Choose upload method:",
+        ["File Upload", "URL"],
+        horizontal=True
+    )
     
-    with col1:
-        uploaded_file = st.file_uploader(
-            "Choose a document",
-            type=['pdf', 'docx', 'doc'],
-            help="Upload PDF or Word documents"
-        )
+    col1, col2 = st.columns([3, 1])
     
-    with col2:
-        doc_type = st.selectbox(
-            "Document Type",
-            ["pdf", "word"],
-            help="Select the type of document you're uploading"
-        )
+    if upload_type == "File Upload":
+        with col1:
+            uploaded_file = st.file_uploader(
+                "Choose a document",
+                type=['pdf', 'docx', 'doc'],
+                help="Upload PDF or Word documents"
+            )
+        
+        with col2:
+            auto_detect = st.checkbox("Auto-detect type", value=True)
+            if not auto_detect:
+                doc_type = st.selectbox("Document Type", ["pdf", "word"])
+            else:
+                doc_type = None
+        
+        if uploaded_file and st.button("🚀 Upload & Process"):
+            with st.spinner("Processing document..."):
+                if app.upload_document(file=uploaded_file, doc_type=doc_type):
+                    st.balloons()
     
-    if uploaded_file and st.button("🚀 Upload & Process"):
-        with st.spinner("Processing document..."):
-            if app.upload_document(uploaded_file, doc_type):
-                st.balloons()
+    else:  # URL Upload
+        with col1:
+            url = st.text_input(
+                "Enter document URL:",
+                placeholder="https://example.com/document.pdf",
+                help="Enter a direct URL to a PDF document"
+            )
+        
+        with col2:
+            doc_type = st.selectbox("Document Type", ["pdf", "word"], index=0)
+        
+        if url and st.button("🚀 Load from URL & Process"):
+            with st.spinner("Processing document from URL..."):
+                if app.upload_document(url=url, doc_type=doc_type):
+                    st.balloons()
     
     # Query section
     st.header("💬 Ask Questions")
     
-    # Chat interface
-    if "messages" not in st.session_state:
-        st.session_state.messages = []
+    # Display session status
+    status = app.get_session_status()
+    if status and status.get("document_uploaded"):
+        doc_info = status.get("document_info", {})
+        st.info(f"📄 Document loaded: **{doc_info.get('filename', 'Unknown')}** ({doc_info.get('chunks_count', 0)} chunks)")
     
-    # Display chat history
+    # Chat interface
     for message in st.session_state.messages:
         with st.chat_message(message["role"]):
             st.markdown(message["content"])

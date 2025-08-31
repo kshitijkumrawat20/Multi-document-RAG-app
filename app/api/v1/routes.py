@@ -25,15 +25,30 @@ def get_session(session_id:str) -> Session:
     return session
 
 @router.post("/session", response_model=SessionResponse)
-async def create_session():
+async def create_session(username: str = "anonymous"):
     """Create a new session for document processing"""
-    session_id = session_manager.create_session()
-    print(f"[DEBUG] Created session: {session_id}")
+    session_id = session_manager.create_session(username)
+    print(f"[DEBUG] Created session: {session_id} for user: {username}")
     print(f"[DEBUG] Total sessions now: {len(session_manager.sessions)}")
     return SessionResponse(
         session_id=session_id,
         message="Session created successfully"
     )
+
+@router.get("/sessions/{username}")
+async def get_user_sessions(username: str):
+    """Get all sessions for a user"""
+    sessions = session_manager.get_user_sessions(username)
+    return {"sessions": sessions}
+
+@router.post("/session/{session_id}/restore")
+async def restore_session(session_id: str):
+    """Restore a session from database"""
+    success = session_manager.restore_session(session_id)
+    if success:
+        return {"message": "Session restored successfully"}
+    else:
+        raise HTTPException(status_code=404, detail="Session not found or inactive")
 
 @router.delete("/session/{session_id}")
 async def delete_session(session_id: str):
@@ -43,74 +58,128 @@ async def delete_session(session_id: str):
 
 @router.post("/upload/{session_id}", response_model=UploadResponse)
 async def upload_document(
-    session_id:str, 
-    file: UploadFile = File(...),
-    doc_type: str = Form(...),
+    session_id: str, 
+    file: UploadFile = File(None),
+    url: str = Form(None),
+    doc_type: str = Form(None),
     session: Session = Depends(get_session)
 ):
-    """Upload and process a document"""
+    """Upload and process a document from file or URL"""
     settings = get_settings()
-    # validate file type
-    file_exension = Path(file.filename).suffix.lower()
-    if file_exension not in settings.allowed_file_types:
-        raise HTTPException(
-            status_code=404,
-            detail = f"File type {file_exension} is not allowed"
-        )
-     #Validate file size
-    if file.size > settings.max_file_size:
-        raise HTTPException(
-            status_code=400,
-            detail=f"File size too large. Maximum size: {settings.max_file_size} bytes"
-        )
+    
+    # Validate input - either file or URL must be provided
+    if not file and not url:
+        raise HTTPException(status_code=400, detail="Either file or URL must be provided")
+    
+    if file and url:
+        raise HTTPException(status_code=400, detail="Provide either file or URL, not both")
+    
     try:
-        # create upload dir if not exist
-        upload_dir = Path(settings.upload_dir)
-        upload_dir.mkdir(exist_ok=True)
-
-        # saving temporarily 
-        with tempfile.NamedTemporaryFile(delete= False, suffix = file_exension) as tmp_file:
-            content = await file.read()
-            tmp_file.write(content)
-            tmp_file_path = tmp_file.name
-        
         # Initialize RAG service for this session 
         session.rag_service = RAGService()
+        
+        document_name = ""
+        document_path = None
+        document_url = None
+        
+        if file:
+            # Handle file upload
+            file_extension = Path(file.filename).suffix.lower()
+            if file_extension not in settings.allowed_file_types:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"File type {file_extension} not allowed. Allowed types: {settings.allowed_file_types}"
+                )
+            
+            # Auto-detect document type if not provided
+            if not doc_type:
+                doc_type = "pdf" if file_extension == ".pdf" else "word"
+            
+            # Validate file size
+            content = await file.read()
+            if len(content) > settings.max_file_size:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"File size too large. Maximum size: {settings.max_file_size} bytes"
+                )
+            
+            # Create upload directory
+            upload_dir = Path(settings.upload_dir)
+            upload_dir.mkdir(exist_ok=True)
+            
+            # Save file temporarily
+            with tempfile.NamedTemporaryFile(delete=False, suffix=file_extension) as tmp_file:
+                tmp_file.write(content)
+                tmp_file_path = tmp_file.name
+            
+            document_name = file.filename
+            document_path = tmp_file_path
+            
+            # Load and split document from file
+            session.rag_service.load_and_split_document(
+                type=doc_type, 
+                path=tmp_file_path
+            )
+            
+        else:
+            # Handle URL upload
+            if not doc_type:
+                doc_type = "pdf"  # Default for URLs
+            
+            document_name = url.split('/')[-1] or "URL Document"
+            document_url = url
+            
+            # Load and split document from URL
+            session.rag_service.load_and_split_document(
+                type=doc_type, 
+                url=url
+            ) 
 
-        # Load and split document
-        session.rag_service.load_and_split_document(
-            type = doc_type, 
-            path = tmp_file_path
-        ) 
-
-        # create vectore store 
+        # Create vector store 
         session.rag_service.create_vector_store()
 
-        # update session state 
-
+        # Update session state 
         session.document_uploaded = True
         session.vector_store_created = True
         session.document_info = {
-            "filename": file.filename,
+            "filename": document_name,
             "type": doc_type,
-            "size": file.size,
+            "size": len(content) if file else 0,
             "chunks_count": len(session.rag_service.chunks)
         }
-        # Clean up temporary file
-        os.unlink(tmp_file_path)
+        
+        # Update session in database
+        session_manager.update_session_document(
+            session_id=session_id,
+            document_name=document_name,
+            document_type=doc_type,
+            chunks_count=len(session.rag_service.chunks),
+            pinecone_index=str(session.rag_service.index),
+            pinecone_namespace=session.rag_service.namespace,
+            document_path=document_path,
+            document_url=document_url
+        )
+        
+        # Clean up temporary file if it exists
+        if document_path:
+            try:
+                os.unlink(document_path)
+            except:
+                pass
 
         return UploadResponse(
             session_id=session_id,
-            filename=file.filename,
+            filename=document_name,
             document_type=doc_type,
             chunks_created=len(session.rag_service.chunks),
             message="Document uploaded and processed successfully"
         )
+        
     except Exception as e:
         # Clean up temporary file if it exists
-        if 'temp_file_path' in locals():
+        if 'document_path' in locals() and document_path:
             try:
-                os.unlink(tmp_file_path)
+                os.unlink(document_path)
             except:
                 pass
         raise HTTPException(status_code=500, detail=f"Error processing document: {str(e)}")
