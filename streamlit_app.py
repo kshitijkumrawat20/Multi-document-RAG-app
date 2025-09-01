@@ -317,7 +317,7 @@ def show_document_sources(top_clauses: List[Dict]):
         score = clause.get('score', 0)
         
         # Get relevant metadata (skip technical fields)
-        skip_fields = {'doc_id', 'chunk_id', 'page', 'source', 'file_path', 'type', 'author', 'creator', 'producer'}
+        skip_fields = {'doc_id', 'chunk_id', 'source', 'file_path', 'type', 'author', 'creator', 'producer','doc_category','format','keyword', 'doc_type','modDate','moddate','subject','title','total_pages','trapped','creationDate','creationdate' }
         relevant_metadata = {k: v for k, v in metadata.items() 
                            if k not in skip_fields and v is not None and v != [] and v != ''}
         
