@@ -8,7 +8,7 @@ import magic  # For file type detection
 
 # Configuration
 # API_BASE_URL = "http://localhost:8000/api/v1"
-API_BASE_URL = "https://kshitijk20-claridoc-smartragapp.hf.space/api/v1"
+API_BASE_URL = "https://kshitijk20-claridoc.hf.space/api/v1"
 
 # Professional theme colors for ClariDoc
 THEME_COLORS = {
