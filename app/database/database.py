@@ -10,6 +10,7 @@ class SessionDatabase:
         # Create directory if it doesn't exist
         os.makedirs(os.path.dirname(db_path), exist_ok=True)
         self.init_db()
+        self.migrate_db()
     
     def init_db(self):
         """Initialize the database with required tables"""
@@ -60,6 +61,70 @@ class SessionDatabase:
             """)
             
             conn.commit()
+    
+    def migrate_db(self):
+        """Handle database migrations for existing databases"""
+        with sqlite3.connect(self.db_path) as conn:
+            cursor = conn.cursor()
+            
+            # Check if document_name column exists in sessions table
+            cursor.execute("PRAGMA table_info(sessions)")
+            columns = [column[1] for column in cursor.fetchall()]
+            
+            if 'document_name' not in columns:
+                print("[Database] Adding document_name column to sessions table...")
+                cursor.execute("ALTER TABLE sessions ADD COLUMN document_name TEXT")
+                conn.commit()
+                print("[Database] Migration completed: document_name column added")
+            
+            # Check if document_type column exists
+            if 'document_type' not in columns:
+                print("[Database] Adding document_type column to sessions table...")
+                cursor.execute("ALTER TABLE sessions ADD COLUMN document_type TEXT")
+                conn.commit()
+                print("[Database] Migration completed: document_type column added")
+            
+            # Check if document_path column exists
+            if 'document_path' not in columns:
+                print("[Database] Adding document_path column to sessions table...")
+                cursor.execute("ALTER TABLE sessions ADD COLUMN document_path TEXT")
+                conn.commit()
+                print("[Database] Migration completed: document_path column added")
+            
+            # Check if document_url column exists
+            if 'document_url' not in columns:
+                print("[Database] Adding document_url column to sessions table...")
+                cursor.execute("ALTER TABLE sessions ADD COLUMN document_url TEXT")
+                conn.commit()
+                print("[Database] Migration completed: document_url column added")
+            
+            # Check if pinecone_index column exists
+            if 'pinecone_index' not in columns:
+                print("[Database] Adding pinecone_index column to sessions table...")
+                cursor.execute("ALTER TABLE sessions ADD COLUMN pinecone_index TEXT")
+                conn.commit()
+                print("[Database] Migration completed: pinecone_index column added")
+            
+            # Check if pinecone_namespace column exists
+            if 'pinecone_namespace' not in columns:
+                print("[Database] Adding pinecone_namespace column to sessions table...")
+                cursor.execute("ALTER TABLE sessions ADD COLUMN pinecone_namespace TEXT")
+                conn.commit()
+                print("[Database] Migration completed: pinecone_namespace column added")
+            
+            # Check if chunks_count column exists
+            if 'chunks_count' not in columns:
+                print("[Database] Adding chunks_count column to sessions table...")
+                cursor.execute("ALTER TABLE sessions ADD COLUMN chunks_count INTEGER DEFAULT 0")
+                conn.commit()
+                print("[Database] Migration completed: chunks_count column added")
+            
+            # Check if is_active column exists
+            if 'is_active' not in columns:
+                print("[Database] Adding is_active column to sessions table...")
+                cursor.execute("ALTER TABLE sessions ADD COLUMN is_active BOOLEAN DEFAULT 1")
+                conn.commit()
+                print("[Database] Migration completed: is_active column added")
     
     def create_user(self, username: str, email: str = None) -> int:
         """Create a new user"""
