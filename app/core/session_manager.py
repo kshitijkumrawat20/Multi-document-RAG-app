@@ -5,7 +5,7 @@ from app.services.RAG_service import RAGService
 from app.database.database import SessionDatabase
 from app.schemas.request_models import DocumentTypeSchema
 
-class Session:
+class Session: ## session management 
     def __init__(self, session_id:str):
         self.session_id = session_id 
         self.created_at = datetime.now()
