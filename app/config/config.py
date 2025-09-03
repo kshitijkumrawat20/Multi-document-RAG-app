@@ -1,6 +1,8 @@
 from pydantic_settings import BaseSettings
 from typing import Optional
-
+import os
+from dotenv import load_dotenv 
+load_dotenv()
 class Settings(BaseSettings):
     # API Settings
     api_title: str = "RAG Document Analysis API"
@@ -13,6 +15,9 @@ class Settings(BaseSettings):
     
     # Session Settings
     session_timeout_minutes: int = 60
+
+    database_path: str = os.getenv("DATABASE_PATH", "/tmp/claridoc_data/sessions.db")
+
     
     # API Keys
     gemini_api_key: Optional[str] = None

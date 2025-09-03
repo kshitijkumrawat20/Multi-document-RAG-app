@@ -18,7 +18,7 @@ class CommonMetaData(BaseModel):
     # )
     penalties: Optional[List[str]] = Field(None, description="Penalties/non-compliance consequences")
     notes: Optional[List[str]] = Field(None, description="Freeform additional metadata")
-
+    added_new_keyword: bool = False
 class InsuranceMetadata(CommonMetaData):
 
     # --- Insurance ---
@@ -31,14 +31,13 @@ class InsuranceMetadata(CommonMetaData):
     exclusions: Optional[List[str]] = Field(
         description="List of normalized keywords representing exclusions (short, 2-5 words each, not full paragraphs).", default=None
     )
-    added_new_keyword: bool = False
+    
 
 class HRMetadata(CommonMetaData):
     # --- HR / Employment ---
     policy_type: Optional[str] = None
     applicable_roles: Optional[List[str]] = None
     notice_period: Optional[str] = None
-    added_new_keyword: bool = False
 
 class LegalMetadata(CommonMetaData):
 
@@ -46,7 +45,6 @@ class LegalMetadata(CommonMetaData):
     clause_type: Optional[str] = None
     governing_law: Optional[str] = None
     duration: Optional[str] = None
-    added_new_keyword: bool = False
 
 class FinancialMetadata(CommonMetaData):
 
@@ -54,7 +52,6 @@ class FinancialMetadata(CommonMetaData):
     section: Optional[str] = None
     compliance_requirement: Optional[str] = None
     reporting_frequency: Optional[str] = None
-    added_new_keyword: bool = False
 
 class HealthcareMetadata(CommonMetaData):
 
@@ -62,8 +59,6 @@ class HealthcareMetadata(CommonMetaData):
     disease: Optional[str] = None
     treatment_limit: Optional[str] = None
     validity_period: Optional[str] = None
-    added_new_keyword: bool = False
-
 
 class ProcurementMetadata(CommonMetaData):
 
@@ -72,7 +67,6 @@ class ProcurementMetadata(CommonMetaData):
     contract_value: Optional[str] = None
     payment_terms: Optional[str] = None
     sla_metrics: Optional[List[str]] = None
-    added_new_keyword: bool = False
 
 
 

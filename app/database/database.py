@@ -1,5 +1,7 @@
 import sqlite3
 import os
+import hashlib
+import secrets
 from datetime import datetime
 from typing import Optional, List, Dict
 import json
@@ -23,6 +25,8 @@ class SessionDatabase:
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     username TEXT UNIQUE NOT NULL,
                     email TEXT UNIQUE,
+                    password_hash TEXT,
+                    salt TEXT,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )
             """)
@@ -66,6 +70,22 @@ class SessionDatabase:
         """Handle database migrations for existing databases"""
         with sqlite3.connect(self.db_path) as conn:
             cursor = conn.cursor()
+            
+            # Check if password_hash column exists in users table
+            cursor.execute("PRAGMA table_info(users)")
+            user_columns = [column[1] for column in cursor.fetchall()]
+            
+            if 'password_hash' not in user_columns:
+                print("[Database] Adding password_hash column to users table...")
+                cursor.execute("ALTER TABLE users ADD COLUMN password_hash TEXT")
+                conn.commit()
+                print("[Database] Migration completed: password_hash column added")
+            
+            if 'salt' not in user_columns:
+                print("[Database] Adding salt column to users table...")
+                cursor.execute("ALTER TABLE users ADD COLUMN salt TEXT")
+                conn.commit()
+                print("[Database] Migration completed: salt column added")
             
             # Check if document_name column exists in sessions table
             cursor.execute("PRAGMA table_info(sessions)")
@@ -126,8 +146,69 @@ class SessionDatabase:
                 conn.commit()
                 print("[Database] Migration completed: is_active column added")
     
-    def create_user(self, username: str, email: str = None) -> int:
-        """Create a new user"""
+    def _hash_password(self, password: str, salt: str = None) -> tuple:
+        """Hash a password with salt"""
+        if salt is None:
+            salt = secrets.token_hex(16)
+        
+        # Create password hash using salt
+        password_hash = hashlib.pbkdf2_hmac(
+            'sha256',
+            password.encode('utf-8'),
+            salt.encode('utf-8'),
+            100000  # iterations
+        ).hex()
+        
+        return password_hash, salt
+    
+    def verify_password(self, password: str, password_hash: str, salt: str) -> bool:
+        """Verify a password against its hash"""
+        computed_hash, _ = self._hash_password(password, salt)
+        return computed_hash == password_hash
+    
+    def create_user(self, username: str, password: str, email: str = None) -> int:
+        """Create a new user with hashed password"""
+        with sqlite3.connect(self.db_path) as conn:
+            cursor = conn.cursor()
+            try:
+                # Hash the password
+                password_hash, salt = self._hash_password(password)
+                
+                cursor.execute(
+                    "INSERT INTO users (username, email, password_hash, salt) VALUES (?, ?, ?, ?)",
+                    (username, email, password_hash, salt)
+                )
+                conn.commit()
+                return cursor.lastrowid
+            except sqlite3.IntegrityError:
+                # User already exists
+                raise ValueError(f"User '{username}' already exists")
+    
+    def authenticate_user(self, username: str, password: str) -> Optional[Dict]:
+        """Authenticate a user with username and password"""
+        with sqlite3.connect(self.db_path) as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                "SELECT id, username, email, password_hash, salt, created_at FROM users WHERE username = ?",
+                (username,)
+            )
+            result = cursor.fetchone()
+            
+            if result and result[3] and result[4]:  # Check if password_hash and salt exist
+                user_id, username, email, stored_hash, salt, created_at = result
+                
+                if self.verify_password(password, stored_hash, salt):
+                    return {
+                        'id': user_id,
+                        'username': username,
+                        'email': email,
+                        'created_at': created_at
+                    }
+            
+            return None
+    
+    def create_user_if_not_exists(self, username: str, email: str = None) -> int:
+        """Create a user if they don't exist (for backward compatibility)"""
         with sqlite3.connect(self.db_path) as conn:
             cursor = conn.cursor()
             try:
@@ -171,7 +252,7 @@ class SessionDatabase:
             # Get user_id
             user = self.get_user(username)
             if not user:
-                user_id = self.create_user(username)
+                user_id = self.create_user_if_not_exists(username)
             else:
                 user_id = user['id']
             
