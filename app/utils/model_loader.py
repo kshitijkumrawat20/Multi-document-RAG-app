@@ -68,9 +68,7 @@ class ModelLoader(BaseModel):
         elif self.model_provider =="huggingface":
             load_dotenv()
             print("Loading model from huggingface:")
-            print("HF_TOKEN in env:", os.getenv("HF_TOKEN"))
             api_key = os.getenv("HF_TOKEN")
-            print(f"HF api key {api_key}")
             os.environ["HF_TOKEN"] = api_key  # Ensure the token is set in the environment
             model_name = self.config["embedding_model"]["huggingface"]["model_name"]
             llm = HuggingFaceEmbeddings(model=model_name)
