@@ -61,11 +61,11 @@ class MetadataExtractor:
             print(f"⚠️ Parser failed on doc {document.metadata.get('source')} | error: {e}")
             return metadata_class(added_new_keyword=False)
     
-    def extractMetadata(self, metadata_class : Type[BaseModel], document: Document, known_keywords: dict) -> BaseModel:
+    def extractMetadata(self, metadata_class : Type[BaseModel], document: Document, known_keywords: dict = None) -> BaseModel:
         parser = PydanticOutputParser(pydantic_object=metadata_class)
 
         schema_str = json.dumps(metadata_class.model_json_schema(), indent=2)
-        keywords_str = json.dumps(known_keywords, indent=2)
+        # keywords_str = json.dumps(known_keywords, indent=2)
 
         prompt = ChatPromptTemplate.from_messages([
             ("system", """You are an information extraction system. 
@@ -80,35 +80,34 @@ class MetadataExtractor:
             ⚠️ Content Rules:
             - For exclusions and obligations, DO NOT copy full sentences. 
             - Instead, extract only concise normalized keywords (2–5 words max each).
-            - Use existing keywords if they already exist in the provided list.
-            - Prefer to reuse existing keywords if they are semantically the same.  
-            - If you find a new keyword that is a **sub-type** or **more specific variant** of an existing one, keep both:  
-            *reuse the closest match from existing keywords*, and also add the new one.  
-            - In that case, set `added_new_keyword=true`.
             - Do not include raw paragraphs in the output.
+            - always keep added_new_keyword as True. 
             
             Schema you must follow:
             {schema}
 
-            Existing Keywords:
-            {keywords}
+            
             """),
             ("human", "Text:\n{document_content}")
         ])
-        # - Use existing keywords if they already exist in the provided list.
-        #     - Only create a new keyword if absolutely necessary, and set `added_new_keyword=true`.
-        #     - New keywords must be short (1–3 words).
-        #     - Do NOT invent different variations (e.g., if "Medical" already exists, do not output "Mediclaim Plus").
-        #     - For list fields (like exclusions), reuse existing keywords where possible.
+        # - Instead, extract only concise normalized keywords (2–5 words max each).
+        #     - Use existing keywords if they already exist in the provided list.
+        #     - Prefer to reuse existing keywords if they are semantically the same.  
+        #     - If you find a new keyword that is a **sub-type** or **more specific variant** of an existing one, keep both:  
+        #     *reuse the closest match from existing keywords*, and also add the new one.  
+        #     - In that case, set `added_new_keyword=true`.
+        # Existing Keywords:
+            # {keywords}
+        
         chain = prompt | self.llm | parser
 
         try:
             result = chain.invoke({
                 "schema": schema_str,
-                "keywords": keywords_str,
+                # "keywords": keywords_str,
                 "document_content": document.page_content
             })
             return result
         except OutputParserException as e:
             print(f"⚠️ Parser failed on doc {document.metadata.get('source')} | error: {e}")
-            return metadata_class(added_new_keyword=False)   # instantiate fallback
+            return metadata_class(added_new_keyword=True)   # instantiate fallback

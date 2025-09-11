@@ -10,12 +10,13 @@ from pydantic import BaseModel
 from typing import Type
 from app.utils.metadata_utils import MetadataService
 class splitting_text:
-    def __init__(self, documentTypeSchema:Type[BaseModel], llm=None):
+    def __init__(self, documentTypeSchema:Type[BaseModel], llm=None, embedding_model=None):
         self.llm = llm 
         self.metadata_extractor = MetadataExtractor(llm = self.llm)
         self.metadata_services = MetadataService()
         self.documentTypeSchema = documentTypeSchema
         self.Keywordsfile_path = None
+        self.embedding_model = embedding_model 
 
     def _clean_text(self, text:str)-> str: 
         """Clean extracted page content"""
@@ -41,6 +42,7 @@ class splitting_text:
             
 
             if i == 0:
+                print(f"Processing first page, setting up metadata extraction...")
                 output_folder = "app/data/"
                 filename = page.metadata['source'].replace(".","").replace("\\","")+ ".json"
                 output_path = os.path.join(output_folder, filename)
@@ -66,6 +68,9 @@ class splitting_text:
                     new_data = self.metadata_services.normalize_dict_to_lists(
                     Document_metadata.model_dump(exclude_none= True)
                 )
+                    print(f"processing keywords update for page {i}")
+                    new_data = MetadataService.keyword_sementic_check(new_data,known_keywords,embedding_model = self.embedding_model)
+                    
                     for key,vals in new_data.items():
                         if isinstance(vals,list):
                             known_keywords[key] = list(set(known_keywords.get(key,[]) + vals))  #get the existing key and add vals and convert into set then list and update the file.

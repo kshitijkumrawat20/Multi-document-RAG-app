@@ -18,7 +18,8 @@ class CommonMetaData(BaseModel):
     # )
     penalties: Optional[List[str]] = Field(None, description="Penalties/non-compliance consequences")
     notes: Optional[List[str]] = Field(None, description="Freeform additional metadata")
-    added_new_keyword: bool = False
+    # added_new_keyword: bool = False
+    added_new_keyword: bool = True
 class InsuranceMetadata(CommonMetaData):
 
     # --- Insurance ---

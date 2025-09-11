@@ -86,7 +86,7 @@ class RAGService:
         print(f"[RAGService] Document type scheme detected: {self.DocumentTypeScheme}")
         self.Document_Type = self.metadataservice.Return_document_model(self.DocumentTypeScheme)
         print(f"[RAGService] Document type model: {self.Document_Type}")
-        self.splitter = splitting_text(documentTypeSchema=self.Document_Type, llm=self.llm)
+        self.splitter = splitting_text(documentTypeSchema=self.Document_Type, llm=self.llm, embedding_model=self.embedding_model)
         print("[RAGService] Splitting document into chunks...")
         self.chunks = self.splitter.text_splitting(doc)
         print(f"[RAGService] Total chunks created: {len(self.chunks)}")
