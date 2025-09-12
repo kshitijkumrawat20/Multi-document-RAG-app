@@ -11,6 +11,7 @@ class VectorStore:
         self.text_chunks = text_chunks
         self.current_time = datetime.now()
         self.embedding_model = embedding_model
+        self.index, self.namespace, self.retriever = self.create_vectorestore()
 
     def create_vectorestore(self):
         load_dotenv()
@@ -34,7 +35,11 @@ class VectorStore:
         vector_store = PineconeVectorStore(index = index, embedding=self.embedding_model)
         name_space = f"hackrx-index{time_string}"
         vector_store.add_documents(documents=self.text_chunks, ids = uuids,namespace = name_space )
+        retriever = vector_store.as_retriever(
+            search_type="similarity",
+            search_kwargs={"k": 5},
+        )
 
-        return index, name_space
+        return index, name_space, retriever
 
 
