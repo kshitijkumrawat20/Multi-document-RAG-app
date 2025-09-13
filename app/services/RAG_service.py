@@ -118,16 +118,16 @@ class RAGService:
 
     def create_vector_store(self):
         print("[RAGService] Creating vector store...")
-        self.vector_store = VectorStore(self.chunks, self.embedding_model)
-        self.index, self.namespace, self.retriever = self.vector_store.create_vectorestore()
+        self.vector_store_class_instance = VectorStore(self.chunks, self.embedding_model)
+        self.index, self.namespace, self.vector_store = self.vector_store_class_instance.create_vectorestore()
         print(f"[RAGService] Vector store created. Index: {self.index}, Namespace: {self.namespace}")
 
     def retrive_documents(self, raw_query: str):
         print("[RAGService] Retrieving documents from vector store...")
-        # self.retriever = Retriever(self.index,self.query_embedding,self.query_metadata, self.namespace)
-        # self.result = self.retriever.retrieval_from_pinecone_vectoreStore()
-        self.result = self.retriever.invoke(raw_query)
-        print(f"[RAGService] Retrieval result: {self.result}")
+        self.retriever = Retriever(self.index,self.query_embedding,self.query_metadata, self.namespace, self.vector_store,llm = self.llm)
+        self.result = self.retriever.retrieval_from_pinecone_vectoreStore()
+        # self.result = self.retriever.invoke(raw_query)
+        # print(f"[RAGService] Retrieval result: {self.result}")
 
     def answer_query(self, raw_query:str) -> str:
         """Answer user query using retrieved documents and LLM"""

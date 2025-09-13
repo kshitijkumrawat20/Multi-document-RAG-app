@@ -97,7 +97,9 @@ class splitting_text:
                     }
                 )
                 chunks = splitter.split_documents([temp_doc])
+                print(type(f"Type of chunks is: {chunks}"))
                 all_chunks.extend(chunks)
+
 
         return all_chunks
     
