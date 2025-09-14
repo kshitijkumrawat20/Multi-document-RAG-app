@@ -7,7 +7,7 @@ class Retriever:
         self.metadata = metadata
         self.namespace = namespace
         self.vector_store = vectore_store
-        self.llm = llm
+        self.llm = llm  
         self.retriever = self.vector_store.as_retriever(
             search_type="similarity",
             search_kwargs={"k": 5,"namespace": self.namespace, "filter": self.metadata}

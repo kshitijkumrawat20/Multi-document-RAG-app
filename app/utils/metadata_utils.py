@@ -57,39 +57,51 @@ class MetadataService:
         return normalized
     
     @staticmethod
-    def cosine_similarity(text1, text2, embedding_model) -> float:
-        vector1 = embedding_model.embed_query(text1)
-        vector2 = embedding_model.embed_query(text2)
-        cosine_similarity = np.dot(vector1, vector2) / (np.linalg.norm(vector1) * np.linalg.norm(vector2))
-        return cosine_similarity
+    def cosine_similarity(vec1, vec2) -> float:
+        return np.dot(vec1, vec2) / (np.linalg.norm(vec1) * np.linalg.norm(vec2))
     
     @staticmethod
     def keyword_sementic_check(result, data, embedding_model):
-
-        # result = result.model_dump()
-        # data = json.load(open(data, 'r'))
-        # Compare all keys present in both result and data, and check if any value in result[key] is present in data[key]
         for key in result.keys():
-            print(f"Comparing key: {key}",flush=True)
-            # Only check if both result[key] and data[key] are not None and are lists
+            print(f"Comparing key: {key}", flush=True)
+
             if result[key] is not None and data.get(key) is not None:
-                print(f"result[{key}]: {result[key]}",flush=True)
-                print(f"data[{key}]: {data[key]}",flush=True)
-                # Ensure both are lists (skip if not)
+                print(f"result[{key}]: {result[key]}", flush=True)
+                print(f"data[{key}]: {data[key]}", flush=True)
+
                 if isinstance(result[key], list) and isinstance(data[key], list):
-                    for idx,val in enumerate(result[key]):
-                        print(f"Comparing value: {val}",flush=True)
-                        if val in data[key]:
-                            print(f"'{val}' found in data['{key}']")
+                    # Filter to only strings
+                    data_list = [v for v in data[key] if isinstance(v, str)]
+                    val_list = [v for v in result[key] if isinstance(v, str)]
+                    data_set = set(data_list)
+
+                    if not data_list or not val_list:
+                        print(f"Skipping key '{key}' due to empty valid strings.")
+                        continue
+
+                    # Precompute embeddings for data_list
+                    data_embeddings = {val: embedding_model.embed_query(val) for val in data_list}
+
+                    # Precompute embeddings for val_list
+                    val_embeddings_list = embedding_model.embed_documents(val_list)
+
+                    for idx, val in enumerate(val_list):
+                        print(f"Comparing value: {val}", flush=True)
+
+                        if val in data_set:
+                            print(f"'{val}' found in data['{key}']", flush=True)
                         else:
-                            print(f"'{val}' NOT found in data['{key}']")
-                            for data_val in data[key]:
-                                similarity = MetadataService.cosine_similarity(val, data_val,embedding_model)
-                                print(f"Cosine similarity between '{val}' and '{data_val}': {similarity}")
+                            print(f"'{val}' NOT found in data['{key}']", flush=True)
+                            val_vector = val_embeddings_list[idx]
+
+                            for data_val, data_vector in data_embeddings.items():
+                                similarity = MetadataService.cosine_similarity(val_vector, data_vector)
+                                print(f"Cosine similarity between '{val}' and '{data_val}': {similarity}", flush=True)
                                 if similarity > 0.90:
-                                    print(f"'{val}' is similar to '{data_val}' with similarity {similarity}",flush=True)
-                                    ## if similarity is greater than 0.90, then consider it as matched and replace the value in result with data value
+                                    print(f"'{val}' is similar to '{data_val}' with similarity {similarity}", flush=True)
                                     result[key][idx] = data_val
+                                    break
                                 else:
-                                    print(f"'{val}' is NOT similar to '{data_val}' with similarity {similarity}",flush=True)
+                                    print(f"'{val}' is NOT similar to '{data_val}' with similarity {similarity}", flush=True)
+
         return result

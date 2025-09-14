@@ -3,7 +3,7 @@ from typing import List, Dict, Any, Optional, Union, Literal
 
 class CommonMetaData(BaseModel):
     # --- Common metadata (across all domains) ---
-    doc_id: Optional[List[str]] = Field(None, description="Unique document identifier")
+    # doc_id: Optional[List[str]] = Field(None, description="Unique document identifier")
     doc_category: Optional[List[str]] = Field(None, description="General pool/category e.g. Insurance, HR, Legal")
     doc_type: Optional[List[str]] = Field(None, description="Specific type e.g. Policy doc, Contract, Handbook")
     jurisdiction: Optional[List[str]] = Field(
@@ -17,7 +17,7 @@ class CommonMetaData(BaseModel):
     #     description="List of short, normalized obligation keywords (2–5 words each, no full sentences)"
     # )
     penalties: Optional[List[str]] = Field(None, description="Penalties/non-compliance consequences")
-    notes: Optional[List[str]] = Field(None, description="Freeform additional metadata")
+    # notes: Optional[List[str]] = Field(None, description="Freeform additional metadata")
     # added_new_keyword: bool = False
     added_new_keyword: bool = True
 class InsuranceMetadata(CommonMetaData):
@@ -28,7 +28,7 @@ class InsuranceMetadata(CommonMetaData):
     default=None,
     description="Type(s) of coverage. Short keywords (1–3 words each)."
     )
-    premium_amount: Optional[List[str]] = None
+    # premium_amount: Optional[List[str]] = None
     exclusions: Optional[List[str]] = Field(
         description="List of normalized keywords representing exclusions (short, 2-5 words each, not full paragraphs).", default=None
     )
