@@ -1,16 +1,22 @@
-# from app.schemas.request_models import ClauseHit
+
+from langchain.retrievers import EnsembleRetriever
 
 class Retriever:
-    def __init__(self, pinecone_index, query = None, metadata = None, namespace=None, vectore_store = None, llm = None):
+    def __init__(self, pinecone_index, query = None, metadata = None, namespace=None, vectore_store = None,sparse_retriever = None, llm = None):
         self.pinecone_index = pinecone_index
         self.query = query
         self.metadata = metadata
         self.namespace = namespace
         self.vector_store = vectore_store
+        self.sparse_retriever = sparse_retriever
         self.llm = llm  
-        self.retriever = self.vector_store.as_retriever(
+        self.dense_retriever = self.vector_store.as_retriever(
             search_type="similarity",
             search_kwargs={"k": 5,"namespace": self.namespace, "filter": self.metadata}
+        )
+        self.hybrid_retriever = EnsembleRetriever(
+            retrievers=[self.dense_retriever, sparse_retriever],  # Use .retriever attribute
+            weights=[0.7, 0.3]  # Fix: 'weights' not 'weight'
         )
 
 
@@ -57,7 +63,7 @@ class Retriever:
         #         score=match['score']
         #     ))
         # return hits
-        results = self.retriever.invoke(self.query)
+        results = self.hybrid_retriever.invoke(self.query)
         for doc in results:
             print(f"printing Doc content : {doc.page_content}")
         return results

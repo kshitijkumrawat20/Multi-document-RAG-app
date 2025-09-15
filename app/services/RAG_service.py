@@ -1,4 +1,3 @@
-from typing import List 
 from app.utils.model_loader import ModelLoader
 from app.ingestion.file_loader import FileLoader
 from app.ingestion.text_splitter import splitting_text
@@ -7,11 +6,10 @@ from app.embedding.embeder import QueryEmbedding
 from app.embedding.vectore_store import VectorStore
 from app.metadata_extraction.metadata_ext import MetadataExtractor
 from app.utils.metadata_utils import MetadataService
-# from app.utils.document_op import DocumentOperation
 from langchain_core.documents import Document
 import json
-from typing import List, Optional
-# ...existing imports...
+from langchain_community.retrievers import BM25Retriever
+from langchain.schema import Document
 
 # Global model instances (loaded once)
 _embedding_model = None
@@ -121,12 +119,17 @@ class RAGService:
         self.vector_store_class_instance = VectorStore(self.chunks, self.embedding_model)
         self.index, self.namespace, self.vector_store = self.vector_store_class_instance.create_vectorestore()
         print(f"[RAGService] Vector store created. Index: {self.index}, Namespace: {self.namespace}")
+        ### Sparse Retriever(BM25)
+        self.sparse_retriever=BM25Retriever.from_documents(self.chunks)
+        self.sparse_retriever.k=3 ##top- k documents to retriever
+
+        
 
     def retrive_documents(self, raw_query: str):
         print("[RAGService] Retrieving documents from vector store...")
         self.create_query_embedding(raw_query)
         
-        self.retriever = Retriever(self.index,raw_query,self.query_metadata, self.namespace, self.vector_store,llm = self.llm)
+        self.retriever = Retriever(self.index,raw_query,self.query_metadata, self.namespace, self.vector_store,sparse_retriever = self.sparse_retriever,llm = self.llm)
         self.result = self.retriever.retrieval_from_pinecone_vectoreStore()
         # self.result = self.retriever.invoke(raw_query)
         # print(f"[RAGService] Retrieval result: {self.result}")
@@ -134,16 +137,17 @@ class RAGService:
     def answer_query(self, raw_query:str) -> str:
         """Answer user query using retrieved documents and LLM"""
         print(f"[RAGService] Answering query: {raw_query}")
-        top_clause = self.result['matches']
-        top_clause_dicts = [r.to_dict() for r in top_clause]
-        self.top_clauses = top_clause_dicts
-        keys_to_remove = {"file_path", "source", "producer", "keywords", "subject", "added_new_keyword", "author", "chunk_id"}
-        for r in top_clause_dicts:
-            meta = r.get("metadata", {})
-            for k in keys_to_remove:
-                meta.pop(k, None)
+        # top_clause = self.result['matches']
+        # top_clause_dicts = [r.to_dict() for r in top_clause]
+        # self.top_clauses = top_clause_dicts
+        # keys_to_remove = {"file_path", "source", "producer", "keywords", "subject", "added_new_keyword", "author", "chunk_id"}
+        # for r in top_clause_dicts:
+        #     meta = r.get("metadata", {})
+        #     for k in keys_to_remove:
+        #         meta.pop(k, None)
 
-        context_clauses = json.dumps(top_clause_dicts, separators=(",", ":"))
+        # context_clauses = json.dumps(top_clause_dicts, separators=(",", ":"))
+        context_clauses = [doc.page_content for doc in self.result]
 
         print(f"context_clauses: {context_clauses}")
 

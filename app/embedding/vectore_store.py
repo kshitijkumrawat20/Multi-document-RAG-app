@@ -5,7 +5,6 @@ from pinecone import ServerlessSpec
 from langchain_pinecone import PineconeVectorStore
 from datetime import datetime
 from uuid import uuid4
-
 class VectorStore:
     def __init__(self, text_chunks, embedding_model):
         self.text_chunks = text_chunks
