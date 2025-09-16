@@ -20,3 +20,10 @@ class UploadResponse(BaseModel):
 class ErrorResponse(BaseModel):
     detail: str
     error_code: Optional[str] = None
+
+class SourceDocument(BaseModel):
+    doc_id: str
+    page: int
+    text: str
+    score: float
+    metadata: Dict[str, Any]

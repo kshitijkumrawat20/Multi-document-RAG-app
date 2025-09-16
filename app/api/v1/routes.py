@@ -9,6 +9,7 @@ from app.services.RAG_service import RAGService
 from app.schemas.request_models import QueryRequest
 from app.schemas.response_models import SessionResponse, QueryResponse,UploadResponse
 from app.config.config import get_settings
+from app.schemas.response_models import SessionResponse, QueryResponse, UploadResponse,SourceDocument
 
 router = APIRouter()
 
@@ -126,11 +127,25 @@ async def query_document(
         session.rag_service.create_query_embedding(query_request.query)
 
         # retrive relevant docs 
-        session.rag_service.retrive_documents()
+        session.rag_service.retrive_documents(query_request.query)
 
         # generate answer
         answer = session.rag_service.answer_query(query_request.query)
-
+        sources = []
+        if hasattr(session.rag_service, 'result') and session.rag_service.result:
+            matches = session.rag_service.result
+            for match in matches[:3]:  # Top 3 sources
+                metadata = match.metadata
+                score = session.rag_service.metadataservice.cosine_similarity(vec1=session.rag_service.embedding_model.embed_query(match.page_content), vec2=session.rag_service.embedding_model.embed_query(
+                    session.rag_service.query
+                ))
+                sources.append(SourceDocument(
+                            doc_id=metadata['doc_id'],
+                            page=metadata['page_no'],
+                            text=match.page_content,
+                            score=score,
+                            metadata=metadata
+                        ))
         return QueryResponse(
             session_id=session_id,
             query=query_request.query,

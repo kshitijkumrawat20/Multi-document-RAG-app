@@ -91,6 +91,7 @@ class RAGService:
 
     def create_query_embedding(self, query: str):
         print("[RAGService] Creating query embedding...")
+        self.query = query
         self.query_embedder = QueryEmbedding(query=query, embedding_model=self.embedding_model)
         self.query_embedding = self.query_embedder.get_embedding()
         print(f"[RAGService] Query embedding created: {self.query_embedding}")
